@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { Sticker } = require('wa-sticker-formatter');
-const { cmd } = require('../command');
+const axios = require("axios");
+const { Sticker } = require("wa-sticker-formatter");
+const { cmd } = require("../command");
 
 cmd({
     pattern: "emojimix",
@@ -19,36 +19,32 @@ async (conn, mek, m, { from, sender, args, reply }) => {
 
         const [emoji1, emoji2] = args[0].split('+');
 
-        // Fetch from emoji.kitchen API
-        const res = await axios.get(`https://tenor.googleapis.com/v2/featured`, {
-            params: {
-                key: 'AIzaSyD-m9XKo_pX2ZYr1OO3GopOIgJhXgNH9uU', // Google API key
-                contentfilter: 'high',
-                media_filter: 'png_transparent',
-                component: 'emojikitchen',
-                q: `${emoji1}_${emoji2}`
-            }
-        });
+        // Get encoded emojis
+        const encodeEmoji = e => encodeURIComponent(e);
+
+        // Build Google Emoji Kitchen URL pattern
+        const url = `https://tenor.googleapis.com/v2/featured?key=AIzaSyAyASmjh9B9isZ9oa0_LsC6w7X8pxSPGzU&contentfilter=high&media_filter=png_transparent&component=emojikitchen&q=${encodeEmoji(emoji1)}_${encodeEmoji(emoji2)}`;
+
+        const res = await axios.get(url);
 
         if (!res.data.results || res.data.results.length === 0) {
-            return reply('❌ Could not find a mix for those emojis.');
+            return reply("❌ Could not find a mix for those emojis.");
         }
 
         const imageUrl = res.data.results[0].url;
 
-        // Convert to sticker
         const sticker = new Sticker(imageUrl, {
-            pack: 'EmojiMix Pack',
-            author: 'PK-Tech',
-            type: 'full',
-            categories: ['fun'],
+            pack: "EmojiMix Pack",
+            author: "PK-Tech",
+            type: "full",
+            categories: ["fun"],
         });
 
         const buffer = await sticker.toBuffer();
         await conn.sendMessage(from, { sticker: buffer }, { quoted: mek });
 
     } catch (error) {
-        console.error('Error in emojimix:', error);
-        reply('❌ Failed to mix emojis. Try different ones.');
+        console.error("Error in emojimix:", error);
+        reply("❌ Failed to mix emojis. Try different ones.");
     }
 });
