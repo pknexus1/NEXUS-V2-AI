@@ -23,35 +23,27 @@ async (conn, mek, m, { from, sender, reply, args }) => {
             return reply("❌ That is not a valid Facebook link.");
         }
 
-        // Send loading reaction
         await conn.sendMessage(from, {
             react: { text: '🔄', key: mek.key }
         });
 
-        // Fetch video data from API
         const apiURL = `https://tcs-demonic2.vercel.app/api/fbdownloader?url=${encodeURIComponent(url)}`;
-        const response = await axios.get(apiURL);
-        const data = response.data;
+        const { data } = await axios.get(apiURL);
 
-        if (!data || !data.result || !data.result.sd || data.result.sd === "") {
+        if (!data || !data.status || !data.video || !data.video.sd) {
             return reply("⚠️ API did not return a valid video. Please try again later!");
         }
 
-        const fbvid = data.result.sd;
+        const fbvid = data.video.sd || data.video.hd;
         if (!fbvid) {
             return reply("⚠️ No valid video found. Please check the link.");
         }
 
-        // Create temp directory
         const tmpDir = path.join(process.cwd(), 'tmp');
-        if (!fs.existsSync(tmpDir)) {
-            fs.mkdirSync(tmpDir, { recursive: true });
-        }
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-        // Temp file path
         const tempFile = path.join(tmpDir, `fb_${Date.now()}.mp4`);
 
-        // Download video
         const videoResponse = await axios({
             method: 'GET',
             url: fbvid,
@@ -66,14 +58,12 @@ async (conn, mek, m, { from, sender, reply, args }) => {
             writer.on('error', reject);
         });
 
-        // Send video
         await conn.sendMessage(from, {
             video: { url: tempFile },
             mimetype: "video/mp4",
             caption: "📥 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱𝗲𝗱 𝗕𝘆 𝐒𝐀𝐌𝐒𝐔𝐍𝐆_𝐗𝐌𝐃"
         }, { quoted: mek });
 
-        // Clean up
         fs.unlinkSync(tempFile);
 
     } catch (error) {
