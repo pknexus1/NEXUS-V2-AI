@@ -6,7 +6,7 @@ cmd({
     pattern: "antibug",
     alias: ["bugblock", "lagblock"],
     use: ".antibug on/off",
-    desc: "Toggle Anti-Bug protection for group.",
+    desc: "Toggle Anti-Bug reaction mode.",
     category: "security",
     react: "🛡️",
     filename: __filename
@@ -19,10 +19,10 @@ async (conn, mek, m, { from, args, sender, isGroup, isAdmins, reply }) => {
         const choice = args[0]?.toLowerCase();
         if (choice === "on") {
             antiBugEnabled = true;
-            reply("✅ Anti-Bug protection is now *ENABLED* 🛡️");
+            reply("✅ Anti-Bug reaction is now *ENABLED* 🛡️");
         } else if (choice === "off") {
             antiBugEnabled = false;
-            reply("❌ Anti-Bug protection is now *DISABLED* 🚫");
+            reply("❌ Anti-Bug reaction is now *DISABLED* 🚫");
         } else {
             reply("ℹ️ Usage: `.antibug on` or `.antibug off`");
         }
@@ -34,23 +34,24 @@ async (conn, mek, m, { from, args, sender, isGroup, isAdmins, reply }) => {
 
 // Listen to all incoming messages for bug detection
 cmd({
-    on: "message", // Listen to all messages
+    on: "message",
     filename: __filename
 },
-async (conn, mek, m, { from, body, isGroup, sender, reply }) => {
+async (conn, mek, m, { from, body, isGroup }) => {
     try {
         if (!antiBugEnabled || !isGroup) return;
 
-        // Basic Bug Detection Rules
-        const longText = body && body.length > 1500; // Huge text = possible bug
-        const crashPatterns = /(‏‏|۝|۞|۩|𒀱|🇦🇫🇦🇫🇦🇫|🇮🇳🇮🇳🇮🇳)/g; // Known bug symbols
+        // Bug detection patterns
+        const longText = body && body.length > 1500;
+        const crashPatterns = /(‏‏|۝|۞|۩|𒀱|🇦🇫🇦🇫🇦🇫|🇮🇳🇮🇳🇮🇳)/g;
 
         if (longText || crashPatterns.test(body)) {
-            await conn.sendMessage(from, { delete: mek.key }); // Delete the message
-            await reply(`⚠️ *Bug message detected and removed!*`);
-            console.log(`Blocked bug from ${sender}`);
+            await conn.sendMessage(from, {
+                react: { text: "⚠️", key: mek.key } // Just react, no reply
+            });
         }
     } catch (e) {
         console.error("AntiBug detection error:", e);
     }
 });
+    
