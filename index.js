@@ -123,20 +123,9 @@ const port = process.env.PORT || 9090;
 ├─ 🔫 *Join Channel:*  
 │ ★   https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j    
 ╰─🔥 *Powered by Pkdriller*`;
-  await conn.sendMessage(conn.user.id, {
-        image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` },
-        caption: up,
-        contextInfo: {
-            forwardingScore: 1,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: "120363297417334452@newsletter", // jid ya channel yako
-                newsletterName: "NEXUS UPDATES", // jina la channel
-                serverMessageId: 1
-            }
-        }
-    });
-}
+    conn.sendMessage(conn.user.id, { image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` }, caption: up })
+  }
+  })
   conn.ev.on('creds.update', saveCreds)
 
   //==============================
