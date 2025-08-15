@@ -1,6 +1,5 @@
-const config = require('../config');
+const axios = require('axios');
 const { cmd } = require('../command');
-const axios = require('axios'); // npm install axios
 
 cmd({
     pattern: "quote",
@@ -13,9 +12,8 @@ cmd({
 },
 async (conn, mek, m, { from, sender, reply }) => {
     try {
-        // Fetch a random quote
-        const res = await axios.get("https://api.quotable.io/random");
-        const { content, author } = res.data;
+        const res = await axios.get("https://zenquotes.io/api/random");
+        const { q: content, a: author } = res.data[0];
 
         const quoteMessage = `
 💡 *Quote of the Day*
@@ -33,7 +31,7 @@ async (conn, mek, m, { from, sender, reply }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363288304618280@newsletter', // Brand style
+                    newsletterJid: '120363288304618280@newsletter',
                     newsletterName: "pk-tech",
                     serverMessageId: 146
                 }
