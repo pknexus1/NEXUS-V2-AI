@@ -9,23 +9,23 @@ cmd({
     react: "🗑️",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, reply }) => {
+async (conn, mek, m, { from, reply }) => {
     try {
-        // Must be used by replying to a message
-        if (!quoted) {
+        const quotedMsg = mek.message?.extendedTextMessage?.contextInfo;
+
+        if (!quotedMsg || !quotedMsg.stanzaId) {
             return reply("❌ Please reply to the message you want to delete.");
         }
 
         await conn.sendMessage(from, {
             delete: {
                 remoteJid: from,
-                fromMe: false, // delete for everyone
-                id: quoted.key.id,
-                participant: quoted.key.participant || quoted.key.remoteJid
+                id: quotedMsg.stanzaId,
+                fromMe: false,
+                participant: quotedMsg.participant
             }
         });
 
-        reply("✅ Message deleted for everyone.");
     } catch (e) {
         console.error("Error in delete command:", e);
         reply(`❌ Failed to delete message: ${e.message}`);
