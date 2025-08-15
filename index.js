@@ -113,15 +113,15 @@ const port = process.env.PORT || 9090;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  let up = `╭─〔 *🤖 NEXUS-AI BOT* 〕  
-├─▸  
-│     
-╰─➤ 
-
+  let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕  
+├─▸  ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+│★  *NEXT GENERATION NEW BOT BY DEV PKDRILLER* 
+╰─➤ *FOR ANY QUESTION 🚫 OR PROBLEM ❗ CONTACT OWNER*↩️
+      https://contact-pk-three.vercel.app/
 ╭──〔 🔗 *Information* 〕  
 ├─ 🧩 *Prefix:* = ${prefix}
 ├─ 🔫 *Join Channel:*  
-│    https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j    
+│ ★   https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j    
 ╰─🔥 *Powered by Pkdriller*`;
     conn.sendMessage(conn.user.id, { image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` }, caption: up })
   }
