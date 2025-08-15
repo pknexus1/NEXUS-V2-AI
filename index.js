@@ -123,43 +123,20 @@ const port = process.env.PORT || 9090;
 ├─ 🔫 *Join Channel:*  
 │ ★   https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j    
 ╰─🔥 *Powered by Pkdriller*`;
-    await conn.sendMessage(conn.user.id, {
-                image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` },
-                caption: up,
-                contextInfo: {
-                    mentionedJid: [conn.user.id],
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363297417334452@newsletter',
-                        newsletterName: "NEXUS UPDATES",
-                        serverMessageId: -1
-                    },
-                    externalAdReply: {
-                        title: "🤖 Nexus-AI Connected",
-                        body: "Bot is now online ✅",
-                        mediaType: 1,
-                        thumbnailUrl: "https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg",
-                        sourceUrl: "https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j"
-                    }
-                }
-            }, {
-                quoted: {
-                    key: {
-                        fromMe: true,
-                        participant: "0@s.whatsapp.net",
-                        remoteJid: "status@broadcast"
-                    },
-                    message: {
-                        contactMessage: {
-                            displayName: "Nexus-AI System",
-                            vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;Nexus AI;;;\nFN:Nexus AI\nitem1.TEL;waid=254799056874:+254 799 056 874\nitem1.X-ABLabel:Owner\nEND:VCARD`
-                        }
-                    }
-                }
-            });
+  await conn.sendMessage(conn.user.id, {
+        image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` },
+        caption: up,
+        contextInfo: {
+            forwardingScore: 1,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: "120363297417334452@newsletter", // jid ya channel yako
+                newsletterName: "NEXUS UPDATES", // jina la channel
+                serverMessageId: 1
+            }
         }
     });
+}
   conn.ev.on('creds.update', saveCreds)
 
   //==============================
