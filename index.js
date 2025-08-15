@@ -96,53 +96,36 @@ const port = process.env.PORT || 9090;
           version
           })
       
-  conn.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect } = update;
-
-    if (connection === 'close') {
-        if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-            connectToWA();
-        }
-    } else if (connection === 'open') {
-        console.log('🧬 Installing Plugins');
-        const path = require('path');
-        fs.readdirSync("./plugins/").forEach((plugin) => {
-            if (path.extname(plugin).toLowerCase() === ".js") {
-                require("./plugins/" + plugin);
-            }
-        });
-        console.log('Plugins installed successful ✅');
-        console.log('Bot connected to WhatsApp ✅');
-
-        let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕  
+  conn.ev.on('connection.update', (update) => {
+  const { connection, lastDisconnect } = update
+  if (connection === 'close') {
+  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+  connectToWA()
+  }
+  } else if (connection === 'open') {
+  console.log('🧬 Installing Plugins')
+  const path = require('path');
+  fs.readdirSync("./plugins/").forEach((plugin) => {
+  if (path.extname(plugin).toLowerCase() == ".js") {
+  require("./plugins/" + plugin);
+  }
+  });
+  console.log('Plugins installed successful ✅')
+  console.log('Bot connected to whatsapp ✅')
+  
+  let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕  
 ├─▸  ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 │★  *NEXT GENERATION NEW BOT BY DEV PKDRILLER* 
 ╰─➤ *FOR ANY QUESTION 🚫 OR PROBLEM ❗ CONTACT OWNER*↩️
       https://contact-pk-three.vercel.app/
 ╭──〔 🔗 *Information* 〕  
-├─ 🧩 *Prefix:* ${prefix}
+├─ 🧩 *Prefix:* = ${prefix}
 ├─ 🔫 *Join Channel:*  
 │ ★   https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j    
 ╰─🔥 *Powered by Pkdriller*`;
-
-        await conn.sendMessage(conn.user.id, {
-            image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` },
-            caption: up,
-            contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363297417334452@newsletter", // JID ya channel yako
-                    newsletterName: "NEXUS UPDATES", // Jina la channel
-                    serverMessageId: 1
-                }
-            }
-        });
-    }
-});
+    conn.sendMessage(conn.user.id, { image: { url: `https://i.postimg.cc/SR9S0ZdT/11900809-f4ad-46ee-bedf-f430eed4bab8.jpg` }, caption: up })
   }
-});
-	  
+  })
   conn.ev.on('creds.update', saveCreds)
 
   //==============================
