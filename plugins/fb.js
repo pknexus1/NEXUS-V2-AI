@@ -29,14 +29,15 @@ async (conn, mek, m, { from, sender, reply, args }) => {
         });
 
         // Fetch video data from API
-        const response = await axios.get(`https://www.velyn.biz.id/api/downloader/facebookdl?url=${url}`);
+        const apiURL = `https://tcs-demonic2.vercel.app/api/fbdownloader?url=${encodeURIComponent(url)}`;
+        const response = await axios.get(apiURL);
         const data = response.data;
 
-        if (!data || data.status !== 200 || !data.facebook || !data.facebook.sdVideo) {
-            return reply("⚠️ API did not return a valid response. Please try again later!");
+        if (!data || !data.result || !data.result.sd || data.result.sd === "") {
+            return reply("⚠️ API did not return a valid video. Please try again later!");
         }
 
-        const fbvid = data.facebook.sdVideo;
+        const fbvid = data.result.sd;
         if (!fbvid) {
             return reply("⚠️ No valid video found. Please check the link.");
         }
@@ -54,12 +55,7 @@ async (conn, mek, m, { from, sender, reply, args }) => {
         const videoResponse = await axios({
             method: 'GET',
             url: fbvid,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0',
-                'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
-                'Range': 'bytes=0-'
-            }
+            responseType: 'stream'
         });
 
         const writer = fs.createWriteStream(tempFile);
@@ -85,4 +81,3 @@ async (conn, mek, m, { from, sender, reply, args }) => {
         reply(`❌ An error occurred: ${error.message}`);
     }
 });
-        
