@@ -1,70 +1,51 @@
 const { cmd } = require('../command');
 
-let antiBugEnabled = false;
-
 cmd({
     pattern: "antibug",
-    alias: ["bugblock", "lagblock"],
-    use: ".antibug on/off",
-    desc: "Toggle full Anti-Bug protection (delete + kick/block).",
+    desc: "Delete bug/crash messages and remove/block sender.",
     category: "security",
     react: "🛡️",
     filename: __filename
 },
-async (conn, mek, m, { from, args, sender, isGroup, isAdmins, isOwner, reply }) => {
+async (conn, mek, m, { from, isGroup, sender, reply, isBotAdmins }) => {
     try {
-        if (!isOwner) return reply("❌ Only bot owner can enable Anti-Bug.");
+        const bugPatterns = /(‏‏|۝|۞|۩|𒀱|🇦🇫🇦🇫🇦🇫|🇮🇳🇮🇳🇮🇳)/g;
 
-        const choice = args[0]?.toLowerCase();
-        if (choice === "on") {
-            antiBugEnabled = true;
-            reply("✅ Anti-Bug protection is now *ENABLED* 🛡️");
-        } else if (choice === "off") {
-            antiBugEnabled = false;
-            reply("❌ Anti-Bug protection is now *DISABLED* 🚫");
-        } else {
-            reply("ℹ️ Usage: `.antibug on` or `.antibug off`");
-        }
-    } catch (e) {
-        console.error("Error in antibug command:", e);
-        reply(`❌ ${e.message}`);
-    }
-});
+        // Check message text
+        const text = m?.text || m?.conversation || "";
+        if (!text) return reply("✅ AntiBug active. No bug detected yet.");
 
-// Listen to all incoming messages
-cmd({
-    on: "message",
-    filename: __filename
-},
-async (conn, mek, m, { from, body, isGroup, sender, isBotAdmins }) => {
-    try {
-        if (!antiBugEnabled) return;
-
-        const longText = body && body.length > 1500;
-        const crashPatterns = /(‏‏|۝|۞|۩|𒀱|🇦🇫🇦🇫🇦🇫|🇮🇳🇮🇳🇮🇳)/g;
-
-        if (longText || crashPatterns.test(body)) {
-            console.log(`🚨 Bug detected from ${sender} in ${isGroup ? "group" : "private chat"}`);
+        // Detect bug
+        if (text.length > 1500 || bugPatterns.test(text)) {
+            await conn.sendMessage(from, { react: { text: "🚫", key: mek.key } });
 
             if (isGroup) {
-                // Delete the bug message
-                await conn.sendMessage(from, { delete: mek.key });
+                if (!isBotAdmins) return reply("❌ I need admin rights to delete and remove.");
+                
+                // Delete message
+                await conn.sendMessage(from, {
+                    delete: {
+                        remoteJid: from,
+                        fromMe: false,
+                        id: mek.key.id,
+                        participant: sender
+                    }
+                });
 
-                // Kick sender if bot is admin
-                if (isBotAdmins) {
-                    await conn.groupParticipantsUpdate(from, [sender], "remove");
-                    await conn.sendMessage(from, { text: `⚠️ ${sender} has been removed for sending bug messages.` });
-                } else {
-                    await conn.sendMessage(from, { text: "❌ Bot is not admin, can't remove member." });
-                }
+                // Remove sender
+                await conn.groupParticipantsUpdate(from, [sender], "remove");
+                await conn.sendMessage(from, { text: `⚠️ ${sender} removed for sending bug message.` });
+
             } else {
-                // In private chat → block sender
+                // Block in private chat
                 await conn.updateBlockStatus(sender, "block");
-                console.log(`🚫 Blocked ${sender} for sending bug in private chat`);
+                await conn.sendMessage(from, { text: `🚫 Blocked ${sender} for sending bug message.` });
             }
+        } else {
+            reply("✅ AntiBug active. No threats found in this message.");
         }
     } catch (e) {
-        console.error("AntiBug detection error:", e);
+        console.error(e);
+        reply(`❌ Error: ${e.message}`);
     }
 });
-                                                       
