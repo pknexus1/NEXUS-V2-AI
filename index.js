@@ -58,16 +58,16 @@ const spamTracker = {}; // Tracks spam messages
 
 // ================== AUTO BIO CONFIG ==================
 const bioQuotes = [
-  "🌟 NEXUS-AI Powered by Pkdriller",
-  "🔥 NEXUS-AIBest WhatsApp Bot",
-  "💻 NEXUS-AI Coding is my passion",
-  "🤖 NEXUS-AI AI is the future",
-  "🚀 NEXUS-AI Exploring new technologies",
-  "📚 NEXUS-AI Learning never stops",
-  "💡 NEXUS-AI Ideas change the world",
-  "🌍 NEXUS-AI Connecting people",
-  "⚡ NEXUS-AI Fast and efficient",
-  "🎯 NEXUS-AI Precision matters"
+  "🌟 Powered by Nexus-AI",
+  "🔥 Best WhatsApp Bot",
+  "💻 Coding is my passion",
+  "🤖 AI is the future",
+  "🚀 Exploring new technologies",
+  "📚 Learning never stops",
+  "💡 Ideas change the world",
+  "🌍 Connecting people",
+  "⚡ Fast and efficient",
+  "🎯 Precision matters"
 ];
 let currentBioIndex = 0;
 
@@ -157,8 +157,12 @@ async function connectToWA() {
   setInterval(() => updateBio(conn), 30 * 1000); // Update every 30 seconds
   
   let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕
+  
 ├─▸  https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
-★      FOLLOW OURW CHANNEL  
+★      FOLLOW OURW CHANNEL 👆
+     ___________________________________
+│★  
+╰─➤  
 ├─ 🧩 *Prefix:* = ${prefix} 
 |    
 ╰─🔥 *Powered by Pkdriller*`;
