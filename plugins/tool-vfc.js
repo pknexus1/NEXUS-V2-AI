@@ -1,51 +1,51 @@
 const fs = require('fs');
-const config = require('../config')
-const { cmd, commands } = require('../command')
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson} = require('../lib/functions')
-
-
-
-//vcf//
+const { cmd } = require('../command');
+const { sleep } = require('../lib/functions');
 
 cmd({
     pattern: 'savecontact',
-    alias: ["vcf","scontact","savecontacts"],
-    desc: 'gc vcard',
+    alias: ["vcf", "scontact", "savecontacts"],
+    desc: 'Save all group contacts as a VCF file.',
     category: 'tools',
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+}, async (conn, mek, m, { from, isGroup, isOwner, groupMetadata, reply }) => {
     try {
-        if (!isGroup) return reply("This command is for groups only.");
-        if (!isOwner) return reply("*_This command is for the owner only_*");
+        // Allow only in groups
+        if (!isGroup) return reply("❌ This command works only in *groups*.");
+        
+        // Allow only the owner
+        if (!isOwner) return reply("🔒 This command is for the *Bot Owner* only.");
 
-        let card = quoted || m; // Handle if quoted message exists
-        let cmiggc = groupMetadata;
-        const { participants } = groupMetadata;
-        
-        let orgiggc = participants.map(a => a.id);
-        let vcard = '';
-        let noPort = 0;
-        
-        for (let a of cmiggc.participants) {
-            vcard += `BEGIN:VCARD\nVERSION:3.0\nFN:[${noPort++}] +${a.id.split("@")[0]}\nTEL;type=CELL;type=VOICE;waid=${a.id.split("@")[0]}:+${a.id.split("@")[0]}\nEND:VCARD\n`;
+        const { participants, subject } = groupMetadata;
+
+        // Prepare VCF content
+        let vcardContent = '';
+        let index = 1;
+        for (let member of participants) {
+            let number = member.id.split("@")[0];
+            vcardContent += `BEGIN:VCARD\nVERSION:3.0\nFN:[${index++}] +${number}\nTEL;type=CELL;type=VOICE;waid=${number}:+${number}\nEND:VCARD\n`;
         }
 
-        let nmfilect = './contacts.vcf';
-        reply('Saving ' + cmiggc.participants.length + ' participants contact');
+        // Save file
+        const filePath = './contacts.vcf';
+        fs.writeFileSync(filePath, vcardContent.trim());
 
-        fs.writeFileSync(nmfilect, vcard.trim());
-        await sleep(2000);
+        reply(`📦 Saving *${participants.length}* contacts from group: *${subject}*`);
+        await sleep(1500);
 
+        // Send file
         await conn.sendMessage(from, {
-            document: fs.readFileSync(nmfilect), 
-            mimetype: 'text/vcard', 
-            fileName: 'JawadTechX.vcf', 
-            caption: `\nDone saving.\nGroup Name: *${cmiggc.subject}*\nContacts: *${cmiggc.participants.length}*\n> ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅᴀᴠɪᴅx ᴛᴇᴄʜ`}, { quoted: mek });
+            document: fs.readFileSync(filePath),
+            mimetype: 'text/vcard',
+            fileName: 'NEXUS_AI_Contacts.vcf',
+            caption: `✅ Successfully saved *${participants.length}* contacts from group: *${subject}*\n\n> 🤖 Powered by *NEXUS-AI* | Credits: pkdriller`
+        }, { quoted: mek });
 
-        fs.unlinkSync(nmfilect); // Cleanup the file after sending
+        // Cleanup
+        fs.unlinkSync(filePath);
+
     } catch (err) {
-        reply(err.toString());
+        console.error("Error in savecontact:", err);
+        reply(`❌ Error: ${err.message}`);
     }
 });
-
-
