@@ -1,66 +1,64 @@
 const { cmd } = require('../command');
-const axios = require('axios');
+const axios = require("axios");
 
 cmd({
-    pattern: "apk",
-    alias: ["app", "playstore"],
-    react: "📦",
-    desc: "Download APK from Playstore using BK9 API",
-    category: "download",
-    use: ".apk <app name>",
-    filename: __filename
-}, async (conn, mek, m, { from, q, reply }) => {
-    try {
-        if (!q) return reply("❌ Please provide an app name to search.");
+  pattern: "apk",
+  desc: "Download APK from Aptoide",
+  category: "download",
+  use: ".apk <app name>",
+  filename: __filename
+}, async (conn, m, store, { from, quoted, q, reply }) => {
+  try {
+    if (!q) return reply("❌ Please provide an app name to search.");
 
-        // Search app from BK9 API
-        let searchRes = await axios.get(`https://bk9.fun/search/apk?q=${encodeURIComponent(q)}`);
-        let searchData = searchRes.data;
+    await conn.sendMessage(from, { react: { text: "⏳", key: m.key } });
 
-        if (!searchData.BK9 || searchData.BK9.length === 0) {
-            return reply("❌ No app found with that name, try again.");
-        }
+    // Correct API endpoint
+    const apiUrl = `https://ws75.aptoide.com/api/7/apps/search?query=${encodeURIComponent(q)}&limit=1`;
+    const response = await axios.get(apiUrl);
+    const data = response.data;
 
-        // Fetch details for first result
-        let appId = searchData.BK9[0].id;
-        let detailsRes = await axios.get(`https://bk9.fun/download/apk?id=${appId}`);
-        let app = detailsRes.data.BK9;
-
-        if (!app || !app.dllink) {
-            return reply("⚠️ Unable to fetch APK link, try again later.");
-        }
-
-        // Caption
-        let caption = `📦 *APK Downloader*
-
-📝 *Name:* ${app.name}
-📂 *Size:* ${app.size || "Unknown"}
-⬇️ *Download Link:* ${app.dllink}
-
-> Powered by PK-XMD 🔥`;
-
-        // Send APK file
-        await conn.sendMessage(from, {
-            document: { url: app.dllink },
-            fileName: `${app.name}.apk`,
-            mimetype: "application/vnd.android.package-archive",
-            caption,
-            contextInfo: {
-                externalAdReply: {
-                    title: app.name,
-                    body: "APK Downloader - Join our WhatsApp Channel",
-                    mediaType: 1,
-                    thumbnailUrl: app.thumbnail || "https://telegra.ph/file/6b6d8a63b8ea2.png",
-                    sourceUrl: "https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j",
-                    mediaUrl: "https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j",
-                    showAdAttribution: true,
-                    renderLargerThumbnail: true
-                }
-            }
-        }, { quoted: mek });
-
-    } catch (err) {
-        console.error("APK Download Error:", err);
-        reply("❌ APK download failed. Please try again later.");
+    if (!data?.datalist?.list?.length) {
+      return reply("⚠️ No results found for the given app name.");
     }
+
+    const app = data.datalist.list[0];
+    const appSize = app.size ? (app.size / 1048576).toFixed(2) : "Unknown";
+
+    const caption = `╭━━⪨ *APK Downloader* ⪩━━┈⊷
+┃ 📦 *NAME:* ${app.name}
+┃ 🏋 *SIZE:* ${appSize} MB
+┃ 📦 *PACKAGE:* ${app.package || "Unknown"}
+┃ 📅 *UPDATED ON:* ${app.updated || "N/A"}
+┃ 👨‍💻 *DEVELOPER:* ${app?.developer?.name || "Unknown"}
+╰━━━━━━━━━━━━━━━┈⊷
+> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ RAHEEM-CM*`;
+
+    await conn.sendMessage(from, { react: { text: "⬆️", key: m.key } });
+
+    // Send APK with external preview
+    await conn.sendMessage(from, {
+      document: { url: app.file?.path_alt },
+      fileName: `${app.name}.apk`,
+      mimetype: "application/vnd.android.package-archive",
+      caption,
+      contextInfo: {
+        externalAdReply: {
+          title: app.name,
+          body: "APK Downloader - Join our WhatsApp Channel",
+          mediaType: 1,
+          thumbnailUrl: app.icon || "https://files.catbox.moe/u4l28f.jpg",
+          sourceUrl: "https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x",
+          renderLargerThumbnail: true
+        }
+      }
+    }, { quoted: m });
+
+    await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
+
+  } catch (error) {
+    console.error("Error:", error);
+    reply("❌ An error occurred while fetching the APK. Please try again.");
+  }
 });
+      
