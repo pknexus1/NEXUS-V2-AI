@@ -46,37 +46,32 @@ const prefix = config.PREFIX
 const ownerNumber = ['254799056874']
 
 // ================== CHANNEL CONFIG ==================
-const CHANNEL_JID = "120363288304618280@newsletter"; // Your channel JID
-const CHANNEL_EMOJIS = [
-    '❤️', '🔥', '🌟', '🚀', '💯', '🎯', '⚡', '💎', '👑', 
-    '🤖', '💡', '🎉', '🌈', '🍃', '🌊', '✨', '🦾', '🧠',
-    '🤯', '👀', '🙌', '🫶', '👍', '👏', '🥇', '🏆', '💪',
-    '🎯', '💫', '🌌', '🛸', '🔮', '🧿', '⚙️', '🔋', '💥'
-];
+const CHANNEL_JID = "120363288304618280@newsletter";
+const CHANNEL_LINK = "https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x";
 // ================== END CHANNEL CONFIG ==================
 
 // ================== AUTO BIO CONFIG ==================
-const bioQuotes = [
-  "🌟 Powered by Nexus-AI",
-  "🔥 Best WhatsApp Bot",
-  "💻 Coding is my passion",
-  "🤖 AI is the future",
-  "🚀 Exploring new technologies",
-  "📚 Learning never stops",
-  "💡 Ideas change the world",
-  "🌍 Connecting people",
-  "⚡ Fast and efficient",
-  "🎯 Precision matters"
-];
-let currentBioIndex = 0;
-
 const updateBio = async (conn) => {
   try {
-    const newBio = bioQuotes[currentBioIndex];
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    
+    const bioQuotes = [
+      `🕒 NEXUS-AI | Live: ${timeString} | AI-Powered`,
+      `⚡ NEXUS-AI | Live: ${timeString} | Always Active`,
+      `🌐 NEXUS-AI | Live: ${timeString} | 24/7 Online`,
+      `🚀 NEXUS-AI | Live: ${timeString} | Cutting-Edge Tech`,
+      `🔮 NEXUS-AI | Live: ${timeString} | Future Ready`
+    ];
+    
+    const newBio = bioQuotes[Math.floor(Math.random() * bioQuotes.length)];
     await conn.updateProfileStatus(newBio);
     console.log(`Bio updated to: ${newBio}`);
-    
-    currentBioIndex = (currentBioIndex + 1) % bioQuotes.length;
   } catch (error) {
     console.error('Error updating bio:', error);
   }
@@ -99,6 +94,7 @@ const clearTempDir = () => {
     });
 }
 
+// Clear the temp directory every 5 minutes
 setInterval(clearTempDir, 5 * 60 * 1000);
 
 //===================SESSION-AUTH============================
@@ -115,6 +111,8 @@ console.log("Session downloaded ✅")
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 9090;
+  
+//=============================================
   
 async function connectToWA() {
   console.log("Connecting to WhatsApp ⏳️...");
@@ -147,21 +145,63 @@ async function connectToWA() {
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  // Start auto-bio feature
+  // Start auto-bio feature with live time updates
   updateBio(conn);
-  setInterval(() => updateBio(conn), 30 * 1000);
+  setInterval(() => updateBio(conn), 1000); // Update every second
   
-  let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕
+  // Unique connection message with channel info
+  const now = new Date();
+  const launchTime = now.toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
   
-├─▸  https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
-★      FOLLOW OURW CHANNEL 👆
-     ___________________________________
-│★  
-╰─➤  
-├─ 🧩 *Prefix:* = ${prefix} 
-|    
-╰─🔥 *Powered by Pkdriller*`;
-    conn.sendMessage(conn.user.id, { image: { url: `https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg` }, caption: up })
+  const up = `
+╔════════════════════════╗
+║   🚀 *NEXUS-AI ACTIVATED* 🚀   ║
+╠════════════════════════╣
+║⏰ *Launch Time:* ${launchTime}
+║🔮 *Version:* ${version.join('.')}
+║⚡ *Prefix:* [ ${prefix} ]
+╠════════════════════════╣
+║ *CHANNEL INFO*
+║📢 *ID:* ${CHANNEL_JID}
+║🔗 *Link:* ${CHANNEL_LINK}
+╠════════════════════════╣
+║💻 *System:* ${os.platform()} ${os.arch()}
+║📊 *Memory:* ${(os.freemem()/1024/1024).toFixed(0)}MB free
+╚════════════════════════╝
+`.trim();
+
+    await conn.sendMessage(conn.user.id, { 
+      image: { 
+        url: "https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg" 
+      },
+      caption: up,
+      contextInfo: {
+        externalAdReply: {
+          title: "NEXUS-AI ONLINE",
+          body: "Advanced WhatsApp Bot System",
+          thumbnail: await getBuffer("https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg"),
+          mediaType: 1,
+          sourceUrl: CHANNEL_LINK,
+          showAdAttribution: true
+        }
+      }
+    });
+
+    // Send channel view prompt
+    await conn.sendMessage(conn.user.id, {
+      text: `📢 Tap below to view our channel:\n${CHANNEL_LINK}`,
+      buttons: [
+        { buttonId: `${prefix}channel`, buttonText: { displayText: "View Channel" }, type: 1 }
+      ]
+    });
   }
   })
   conn.ev.on('creds.update', saveCreds)
@@ -172,7 +212,8 @@ async function connectToWA() {
     
     if (message.key.remoteJid === CHANNEL_JID) {
         try {
-            const randomEmoji = CHANNEL_EMOJIS[Math.floor(Math.random() * CHANNEL_EMOJIS.length)];
+            const emojis = ['❤️', '🔥', '🌟', '🚀', '💯', '🎯', '⚡', '💎', '👑'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             
             await conn.sendMessage(message.key.remoteJid, {
                 react: {
@@ -189,7 +230,7 @@ async function connectToWA() {
   });
   // ================== END CHANNEL AUTO-REACT ==================
 
-  // Rest of your existing event handlers...
+  // Rest of your existing event handlers and functions...
   conn.ev.on('messages.update', async updates => {
     for (const update of updates) {
       if (update.update.message === null) {
@@ -202,8 +243,8 @@ async function connectToWA() {
   conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));
 
   // ... (keep all your existing message handling code)
-  
-  // Your existing helper functions...
+
+  // Your existing helper functions remain unchanged...
   conn.decodeJid = jid => {
       if (!jid) return jid;
       if (/:\d+@/gi.test(jid)) {
@@ -217,7 +258,7 @@ async function connectToWA() {
       } else return jid;
   };
 
-  // ... (keep all your existing helper functions)
+  // ... (keep all other existing helper functions exactly as they are)
 
   app.get("/", (req, res) => {
     res.send("NEXUS AI STARTED ✅");
