@@ -3,7 +3,7 @@ const { cmd } = require("../command");
 
 // Facebook Downloader v1 (basic)
 cmd({
-  pattern: "fb2",
+  pattern: "fb",
   alias: ["facebook2", "fbvideo2"],
   react: '📥',
   desc: "Download videos from Facebook (Basic API)",
@@ -47,7 +47,7 @@ cmd({
 
 // Facebook Downloader v2
 cmd({
-  pattern: "fb",
+  pattern: "fb2",
   alias: ["facebook", "fbdl"],
   react: '📥',
   desc: "Download videos from Facebook (API v2)",
@@ -77,7 +77,7 @@ cmd({
 
     await conn.sendMessage(from, {
       video: { url: downloadLink },
-      caption: `> Powered By JawadTechX 💜`
+      caption: `> Powered By  pkdriller`
     }, { quoted: mek });
 
     await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
@@ -121,7 +121,7 @@ cmd({
 
     await conn.sendMessage(from, {
       video: { url: downloadLink },
-      caption: `> Powered By JawadTechX 💜`
+      caption: `> Powered By pkdriller`
     }, { quoted: mek });
 
     await conn.sendMessage(from, { react: { text: '✅', key: m.key } });

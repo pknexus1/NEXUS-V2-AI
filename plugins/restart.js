@@ -3,7 +3,7 @@ const { sleep } = require("../lib/functions");
 
 cmd({  
     pattern: "restart",  
-    desc: "Restart KHAN-MD",  
+    desc: "Restart NEXUS-AI",  
     category: "owner",  
     filename: __filename  
 },  

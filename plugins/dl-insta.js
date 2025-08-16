@@ -38,7 +38,7 @@ cmd({
       {
         [mediaType]: { url: data.downloadUrl },
         mimetype: isVideo ? "video/mp4" : "image/jpeg",
-        caption: `> *Powerd By JawadTechX ♥️*`
+        caption: `> *Powerd By pkdriller *`
       },
       { quoted: m }
     );

@@ -5,7 +5,7 @@ const util = require("util");
 
 cmd({
     pattern: "vv3",
-    alias: ['retrive', '🔥'],
+    alias: ['antiviewonce', '🔥'],
     desc: "Fetch and resend a ViewOnce message content (image/video).",
     category: "misc",
     use: '<query>',
