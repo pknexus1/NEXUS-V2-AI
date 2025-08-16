@@ -7,7 +7,7 @@ cmd({
     desc: "Display the Konde style menu",
     category: "main",
     filename: __filename
-}, async (conn, m, { reply, from }) => {
+}, async (conn, m, { reply }) => {
     try {
         const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
@@ -47,17 +47,35 @@ ${readMore}
 ✨ Powered by ${botName} ✨
         `;
 
-        // Tuma menu kama text
+        // Send menu text WITH contextInfo
         await conn.sendMessage(m.chat, {
-            text: menuText.trim()
+            text: menuText.trim(),
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363288304618280@newsletter",
+                    newsletterName: "PK-XMD CHANNEL",
+                    serverMessageId: -1
+                }
+            }
         }, { quoted: m });
 
-        // Tuma wimbo (weka link yako ya audio hapa)
+        // Send audio attached (nothing more)
         await conn.sendMessage(m.chat, {
-            audio: { url: "https://files.catbox.moe/63jz9o.mp3" }, // badilisha na link ya wimbo unataka
+            audio: { url: "https://files.catbox.moe/63jz9o.mp3" }, // replace with your song URL
             mimetype: "audio/mpeg",
-            ptt: false, // true kama unataka iwe voice note
-            fileName: "menu-song.mp3"
+            fileName: "menu-song.mp3",
+            ptt: false, // true if you want voice note
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363288304618280@newsletter",
+                    newsletterName: "PK-XMD CHANNEL",
+                    serverMessageId: -1
+                }
+            }
         }, { quoted: m });
 
     } catch (e) {
@@ -65,4 +83,4 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
-        
+                
