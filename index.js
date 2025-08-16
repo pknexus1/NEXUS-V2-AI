@@ -47,22 +47,53 @@ const ownerNumber = ['254799056874']
 
 // ================== AUTO BIO CONFIG ==================
 const bioQuotes = [
-  "🌟 Powered by Nexus-AI",
-  "🔥 Best WhatsApp Bot",
-  "💻 Coding is my passion",
-  "🤖 AI is the future",
-  "🚀 Exploring new technologies",
-  "📚 Learning never stops",
-  "💡 Ideas change the world",
-  "🌍 Connecting people",
-  "⚡ Fast and efficient",
-  "🎯 Precision matters"
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `⏰ ${timeString} | NEXUS-AI 🤖 | Always Active`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `🔄 ${timeString} | NEXUS-AI 🤖 | Processing Requests`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `⚡ ${timeString} | NEXUS-AI 🤖 | Lightning Fast`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `🌐 ${timeString} | NEXUS-AI 🤖 | Connected Worldwide`;
+  }
 ];
+
 let currentBioIndex = 0;
 
 const updateBio = async (conn) => {
   try {
-    const newBio = bioQuotes[currentBioIndex];
+    const newBio = bioQuotes[currentBioIndex]();
     await conn.updateProfileStatus(newBio);
     console.log(`Bio updated to: ${newBio}`);
     
@@ -141,21 +172,43 @@ async function connectToWA() {
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  // Start auto-bio feature
+  // Get current time for the connection message
+  const now = new Date();
+  const connectTime = now.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+  
+  // Updated connection message with more context
+  let up = `╭─〔 *🌐 NEXUS-AI CONNECTION ESTABLISHED* 〕
+├─ *🕒 Connection Time:* ${connectTime}
+├─ *⚡ Uptime:* ${runtime(process.uptime())}
+├─ *📊 Memory Usage:* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB
+├─ *🔌 Version:* ${version[0]}.${version[1]}
+│
+├─ *📢 Official Channel:*
+├─ https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
+│
+├─ *🧩 Prefix:* [ ${prefix} ]
+├─ *🤖 Mode:* ${config.MODE}
+╰─➤ *🔮 Powered by Nexus-AI | © ${new Date().getFullYear()}*`;
+
+  // Send connection message with more details
+  conn.sendMessage(conn.user.id, { 
+    image: { url: `https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg` }, 
+    caption: up,
+    contextInfo: {
+      mentionedJid: [conn.user.id],
+      forwardingScore: 999,
+      isForwarded: true
+    }
+  });
+
+  // Start auto-bio feature with live time
   updateBio(conn); // Update immediately
   setInterval(() => updateBio(conn), 30 * 1000); // Update every 30 seconds
-  
-  let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕
-  
-├─▸  https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
-★      FOLLOW OURW CHANNEL 👆
-     ___________________________________
-│★  
-╰─➤  
-├─ 🧩 *Prefix:* = ${prefix} 
-|    
-╰─🔥 *Powered by Pkdriller*`;
-    conn.sendMessage(conn.user.id, { image: { url: `https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg` }, caption: up })
   }
   })
   conn.ev.on('creds.update', saveCreds)
