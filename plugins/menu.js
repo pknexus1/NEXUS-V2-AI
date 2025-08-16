@@ -10,20 +10,17 @@ cmd({
 },
 async (conn, m, { from, reply }) => {
     try {
-        // Get current time/date
         const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
-        
         const botName = "NEXUS-AI";
         const ownerName = "PK-Tech";
         const totalCommands = Object.keys(commands).length;
 
-        // Fetch all command names, ensure dot prefix
+        // Correctly fetch command names
         const commandList = Object.keys(commands)
-            .map(c => `${c.startsWith('.') ? c : `.${c}`}`)
+            .map(c => `.${c}`)
             .join('\n');
 
-        // Read-more collapse
         const readMore = '\u200B'.repeat(4001);
 
         const menuMessage = `
