@@ -1,24 +1,23 @@
 const { cmd, commands } = require('../command');
-const { runtime } = require('../lib/functions');
 const moment = require('moment-timezone');
+const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
     desc: "Display full Konde style menu",
     category: "main",
     filename: __filename
-},
-async (conn, m, { from, reply }) => {
+}, async (conn, m, { from, reply }) => {
     try {
         const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
         const botName = "NEXUS-AI";
         const ownerName = "PK-Tech";
-        const totalCommands = Object.keys(commands).length;
+        const totalCommands = Object.values(commands).length;
 
-        // Correctly fetch command names
-        const commandList = Object.keys(commands)
-            .map(c => `.${c}`)
+        // Get command names correctly
+        const commandList = Object.values(commands)
+            .map(c => `.${c.pattern}`)
             .join('\n');
 
         const readMore = '\u200B'.repeat(4001);
