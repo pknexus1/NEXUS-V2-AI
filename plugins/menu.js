@@ -1,31 +1,43 @@
 const { cmd, commands } = require('../command');
+const { runtime } = require('../lib/functions');
+const moment = require('moment-timezone');
 
 cmd({
     pattern: "menu",
-    desc: "Display all bot commands in read-more style",
+    desc: "Display full Konde style menu",
     category: "main",
     filename: __filename
 },
 async (conn, m, { from, reply }) => {
     try {
-        // Fetch commands dynamically
-        const allCommands = Object.keys(commands);
-        if (!allCommands.length) return reply("❌ No commands found.");
+        // Get current time/date
+        const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
+        const upTime = runtime(process.uptime());
+        
+        const botName = "NEXUS-AI";
+        const ownerName = "PK-Tech";
+        const totalCommands = Object.keys(commands).length;
 
-        // Short command names like .play, .tagall, etc.
-        const commandList = allCommands
-            .map(c => `• ${c.startsWith('.') ? c : `.${c}`}`)
+        // Fetch all command names, ensure dot prefix
+        const commandList = Object.keys(commands)
+            .map(c => `${c.startsWith('.') ? c : `.${c}`}`)
             .join('\n');
 
-        // Add read-more character
-        const readMore = "\u200B".repeat(4001);
+        // Read-more collapse
+        const readMore = '\u200B'.repeat(4001);
 
         const menuMessage = `
-🌟 *NEXUS-AI • Bot Menu* 🌟
-──────────────────────
+🌟 *${botName} MENU* 🌟
+────────────────────
+📅 Date: ${dateNow}
+⚡ Uptime: ${upTime}
+👤 Owner: ${ownerName}
+📌 Total Commands: ${totalCommands}
+────────────────────
 ${commandList}
 ${readMore}
-💬 Type command with prefix to use, e.g., *.play*.
+💬 Type the command with prefix to use, e.g., *.play*
+────────────────────
         `.trim();
 
         await reply(menuMessage);
