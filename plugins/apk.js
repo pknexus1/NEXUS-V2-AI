@@ -1,48 +1,70 @@
-const axios = require("axios");
-const { cmd } = require("../command");
+const config = require('../config');
+const { cmd } = require('../command');
+const axios = require('axios');
 
+// APK Downloader Command
 cmd({
-  pattern: "apk",
-  desc: "Download Android apps (APK) from BK9 API",
-  category: "download",
-  filename: __filename
-}, async (conn, m, { args, reply }) => {
-  const appName = args.join(" ");
-  if (!appName) {
-    return reply("❗ Please provide an app name.\n\nExample: `.apk facebook`");
-  }
+    pattern: "apk",
+    alias: ["app", "playstore"],
+    react: "📦",
+    desc: "Download APK from Playstore",
+    category: "download",
+    use: '.apk <app name>',
+    filename: __filename
+}, async (conn, mek, m, { from, quoted, q, reply }) => {
+    try {
+        if (!q) return reply("❌ Please provide an app name to search.");
 
-  try {
-    // Search app
-    const searchResponse = await axios.get(`https://bk9.fun/search/apk?q=${appName}`);
-    const searchData = searchResponse.data;
+        // Search app using BK9 API
+        let search = await axios.get(`https://bk9.fun/search/apk?q=${encodeURIComponent(q)}`);
+        let searchData = search.data;
 
-    if (!searchData.BK9 || searchData.BK9.length === 0) {
-      return reply("⚠️ No app found with that name, try again.");
+        if (!searchData.BK9 || searchData.BK9.length === 0) {
+            return reply("❌ No app found with that name, try again.");
+        }
+
+        // Get first app details
+        let appId = searchData.BK9[0].id;
+        let details = await axios.get(`https://bk9.fun/download/apk?id=${appId}`);
+        let app = details.data.BK9;
+
+        if (!app || !app.dllink) {
+            return reply("❌ Failed to fetch download link. Try again later.");
+        }
+
+        // Build caption
+        let caption = `📦 *APK Downloader*
+        
+📝 *Name:* ${app.name}
+🆔 *ID:* ${appId}
+📂 *Size:* ${app.size || "Unknown"}
+⬇️ *Download:* [Click Here](${app.dllink})
+
+> Powered by PK-XMD 🔥`;
+
+        // Send APK file
+        await conn.sendMessage(from, {
+            document: { url: app.dllink },
+            fileName: `${app.name}.apk`,
+            mimetype: "application/vnd.android.package-archive",
+            caption,
+            contextInfo: {
+                externalAdReply: {
+                    title: app.name,
+                    body: "APK Downloader - Join our WhatsApp Channel",
+                    thumbnailUrl: app.thumbnail || config.LOGO,
+                    sourceUrl: 'https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j',
+                    mediaUrl: 'https://whatsapp.com/channel/0029VatOy2EAzNc2WcShQw1j',
+                    mediaType: 1,
+                    showAdAttribution: true,
+                    renderLargerThumbnail: true
+                }
+            }
+        }, { quoted: mek });
+
+    } catch (e) {
+        console.error("APK Error:", e);
+        reply("⚠️ APK download failed. Please try again later.");
     }
-
-    // Fetch details of first result
-    const appDetailsResponse = await axios.get(`https://bk9.fun/download/apk?id=${searchData.BK9[0].id}`);
-    const appDetails = appDetailsResponse.data;
-
-    if (!appDetails.BK9 || !appDetails.BK9.dllink) {
-      return reply("❌ Unable to get download link.");
-    }
-
-    // Send APK file
-    await conn.sendMessage(
-      m.chat,
-      {
-        document: { url: appDetails.BK9.dllink },
-        fileName: `${appDetails.BK9.name}.apk`,
-        mimetype: "application/vnd.android.package-archive",
-        caption: `📦 *${appDetails.BK9.name}*\n\n✅ Downloaded via NEXUS-AI Bot`
-      },
-      { quoted: m }
-    );
-
-  } catch (err) {
-    console.error("APK Download Error:", err);
-    reply("🚨 Failed to download APK. Try again later.");
-  }
 });
+          
