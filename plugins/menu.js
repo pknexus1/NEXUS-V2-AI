@@ -4,40 +4,50 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display full Konde style menu",
+    desc: "Display the Konde style menu",
     category: "main",
     filename: __filename
-}, async (conn, m, { from, reply }) => {
+}, async (conn, m, { reply }) => {
     try {
         const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
-        const botName = "NEXUS-AI";
-        const ownerName = "PK-Tech";
+        const botName = "🤖 NEXUS-AI";
+        const ownerName = "👑 PK-Tech";
         const totalCommands = Object.values(commands).length;
 
-        // Get command names correctly
-        const commandList = Object.values(commands)
-            .map(c => `.${c.pattern}`)
-            .join('\n');
+        // Group commands by category
+        let categorized = {};
+        for (let c of Object.values(commands)) {
+            if (!categorized[c.category]) categorized[c.category] = [];
+            categorized[c.category].push(c.pattern);
+        }
 
         const readMore = '\u200B'.repeat(4001);
 
-        const menuMessage = `
-🌟 *${botName} MENU* 🌟
-────────────────────
-📅 Date: ${dateNow}
-⚡ Uptime: ${upTime}
-👤 Owner: ${ownerName}
-📌 Total Commands: ${totalCommands}
-────────────────────
-${commandList}
+        // Build menu
+        let menuText = `
+╭━━━〔 *${botName}* 〕━━━╮
+│ 📅 Date: ${dateNow}
+│ ⏳ Uptime: ${upTime}
+│ 👤 Owner: ${ownerName}
+│ 📌 Total Cmds: ${totalCommands}
+╰━━━━━━━━━━━━━━━━━━━╯
 ${readMore}
-💬 Type the command with prefix to use, e.g., *.play*
+`;
+
+        for (let category in categorized) {
+            menuText += `\n📂 *${category.toUpperCase()}*\n`;
+            menuText += categorized[category].map(cmd => `   ✦ .${cmd}`).join("\n") + "\n";
+        }
+
+        menuText += `
 ────────────────────
-        `.trim();
+💬 Example: *.play song name*
+────────────────────
+✨ Powered by ${botName} ✨
+        `;
 
-        await reply(menuMessage);
-
+        await reply(menuText.trim());
     } catch (e) {
         console.error("Menu Error:", e);
         reply("❌ Failed to fetch menu.");
