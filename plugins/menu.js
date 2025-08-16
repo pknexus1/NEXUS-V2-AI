@@ -1,18 +1,17 @@
 const { cmd, commands } = require('../command');
 const moment = require('moment-timezone');
-const { runtime, getBuffer } = require('../lib/functions');
+const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Show Nexus-AI interactive command menu",
+    desc: "Show Nexus-AI command list",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
     try {
-        // Get info
-        const date = moment().tz('Africa/Nairobi').format('ddd, MMM D YYYY, h:mm A');
-        const uptime = runtime(process.uptime());
-        const totalCmds = Object.values(commands).length;
+        // Basic info
+        const time = moment().tz('Africa/Nairobi').format('HH:mm:ss');
+        const date = moment().tz('Africa/Nairobi').format('DD/MM/YYYY');
         
         // Group commands
         const categories = {};
@@ -21,71 +20,41 @@ cmd({
             categories[cmd.category].push(cmd.pattern);
         });
 
-        // Create beautiful menu
+        // Minimalist menu design
         let menu = `
-╔════════════════════╗
-║   🚀 *NEXUS-AI* 🚀   ║
-╠════════════════════╣
-║  📅 ${date}
-║  ⏱️ ${uptime}
-║  📊 ${totalCmds} Commands
-╠════════════════════╣
-║                                                    ║
-║      *✨ BOT FEATURES* ✨      ║
-║                                                    ║
-║  • AI Chat • Stickers • Downloads  ║
-║  • Games • Tools • Utilities       ║
-║                                                    ║
-╠════════════════════╣
+┌───────────────
+│  ⚡ *NEXUS-AI*  
+├───────────────
+│  🕒 ${time}  
+│  📅 ${date}  
+├───────────────
 `.trim();
 
         // Add commands
         Object.entries(categories).forEach(([category, cmds]) => {
-            menu += `\n║ *${category.toUpperCase()}* \n`;
-            menu += `║ ${cmds.map(c => `⦿ ${c}`).join('  ')}\n`;
+            menu += `\n│ *${category.toUpperCase()}*\n`;
+            cmds.forEach(cmd => {
+                menu += `│ ◦ ${cmd}\n`;
+            });
+            menu += `├───────────────`;
         });
 
-        // Footer
+        // Simple footer
         menu += `
-╠════════════════════╣
-║ *🔹 TIP:* Use .help <cmd> for   ║
-║ details about any command       ║
-║                                                    ║
-║ *Example:* .play faded          ║
-║           .sticker (reply)      ║
-║                                                    ║
-╚════════════════════╝
-🌟 *Powered by PK-Tech* 🌟
-📢 *Updates:* wa.me/yourchannel
+└───────────────
 `.trim();
 
-        // Send with image
-        await conn.sendMessage(m.chat, {
-            image: {
-                url: "https://i.imgur.com/8KQ7X9A.jpg" // Modern tech-themed image
-            },
-            caption: menu,
+        // Send as message
+        await conn.sendMessage(m.chat, { 
+            text: menu,
             contextInfo: {
-                externalAdReply: {
-                    title: "NEXUS-AI COMMANDS",
-                    body: "Your Ultimate WhatsApp Assistant",
-                    thumbnail: await getBuffer("https://i.imgur.com/8KQ7X9A.jpg"),
-                    sourceUrl: "https://wa.me/yourchannel"
-                }
+                forwardingScore: 999,
+                isForwarded: true
             }
         }, { quoted: m });
 
-        // Send audio intro
-        await conn.sendMessage(m.chat, { 
-            audio: { 
-                url: "https://example.com/intro.mp3" 
-            },
-            mimetype: "audio/mpeg",
-            ptt: true
-        });
-
     } catch (error) {
         console.error("Menu error:", error);
-        await reply("❌ Failed to load menu. Please try again later.");
+        await reply("❌ Error loading command list");
     }
 });
