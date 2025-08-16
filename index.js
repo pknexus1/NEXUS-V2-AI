@@ -21,6 +21,8 @@ const {
   Browsers
 } = require('@whiskeysockets/baileys')
 
+const { Boom } = require('@hapi/boom')
+const PhoneNumber = require('awesome-phonenumber')
 const l = console.log
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
 const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data')
@@ -45,18 +47,27 @@ const prefix = config.PREFIX
 
 const ownerNumber = ['254799056874']
 
+// ================== SECURITY CONFIG ==================
+const antiCall = config.ANTI_CALL || 'true'; // 'true' to reject calls, 'false' to allow
+const antiSpam = config.ANTI_SPAM || 'true'; // 'true' to enable anti-spam
+const maxSpamCount = config.MAX_SPAM_COUNT || 5; // Max messages allowed in short time
+const spamWindow = config.SPAM_WINDOW || 5000; // Time window in ms (5 seconds)
+const antiBug = config.ANTI_BUG || 'true'; // 'true' to prevent bug exploits
+const spamTracker = {}; // Tracks spam messages
+// ================== END SECURITY CONFIG ==================
+
 // ================== AUTO BIO CONFIG ==================
 const bioQuotes = [
-  "🌟 Powered by Nexus-AI",
-  "🔥 Best WhatsApp Bot",
-  "💻 Coding is my passion",
-  "🤖 AI is the future",
-  "🚀 Exploring new technologies",
-  "📚 Learning never stops",
-  "💡 Ideas change the world",
-  "🌍 Connecting people",
-  "⚡ Fast and efficient",
-  "🎯 Precision matters"
+  "🌟 NEXUS-AI Powered by Pkdriller",
+  "🔥 NEXUS-AIBest WhatsApp Bot",
+  "💻 NEXUS-AI Coding is my passion",
+  "🤖 NEXUS-AI AI is the future",
+  "🚀 NEXUS-AI Exploring new technologies",
+  "📚 NEXUS-AI Learning never stops",
+  "💡 NEXUS-AI Ideas change the world",
+  "🌍 NEXUS-AI Connecting people",
+  "⚡ NEXUS-AI Fast and efficient",
+  "🎯 NEXUS-AI Precision matters"
 ];
 let currentBioIndex = 0;
 
@@ -146,12 +157,8 @@ async function connectToWA() {
   setInterval(() => updateBio(conn), 30 * 1000); // Update every 30 seconds
   
   let up = `╭─〔 *🤖 NEXUS-AI BOT CONNECTED* 〕
-  
 ├─▸  https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
-★      FOLLOW OURW CHANNEL 👆
-     ___________________________________
-│★  
-╰─➤  
+★      FOLLOW OURW CHANNEL  
 ├─ 🧩 *Prefix:* = ${prefix} 
 |    
 ╰─🔥 *Powered by Pkdriller*`;
@@ -159,6 +166,109 @@ async function connectToWA() {
   }
   })
   conn.ev.on('creds.update', saveCreds)
+
+  // ================== ANTI-CALL FEATURE ==================
+  conn.ev.on('call', async (call) => {
+      try {
+          if (antiCall === 'true') {
+              const caller = call.from;
+              const isOwner = ownerNumber.includes(caller.split('@')[0]);
+              
+              if (!isOwner) {
+                  // Reject the call
+                  await conn.sendMessage(caller, { 
+                      text: `🚫 Calls are not allowed with this bot. Please use text messages only.` 
+                  });
+                  await conn.rejectCall(call.id, call.from);
+                  console.log(`Blocked call from ${caller}`);
+              }
+          }
+      } catch (error) {
+          console.error('Error in anti-call:', error);
+      }
+  });
+  // ================== END ANTI-CALL ==================
+
+  // ================== ANTI-SPAM FEATURE ==================
+  conn.ev.on('messages.upsert', async ({ messages }) => {
+      if (antiSpam !== 'true') return;
+      
+      const message = messages[0];
+      const sender = message.key.remoteJid;
+      const currentTime = Date.now();
+      
+      // Initialize spam tracking for sender if not exists
+      if (!spamTracker[sender]) {
+          spamTracker[sender] = {
+              count: 0,
+              lastMessageTime: currentTime,
+              warned: false
+          };
+      }
+      
+      // Reset count if outside the time window
+      if (currentTime - spamTracker[sender].lastMessageTime > spamWindow) {
+          spamTracker[sender].count = 0;
+          spamTracker[sender].warned = false;
+      }
+      
+      // Update count and time
+      spamTracker[sender].count++;
+      spamTracker[sender].lastMessageTime = currentTime;
+      
+      // Check if sender is spamming
+      if (spamTracker[sender].count > maxSpamCount) {
+          if (!spamTracker[sender].warned) {
+              // Send warning
+              await conn.sendMessage(sender, { 
+                  text: `⚠️ Please don't spam! You're sending too many messages too quickly.` 
+              });
+              spamTracker[sender].warned = true;
+          } else {
+              // Take action if spamming continues after warning
+              await conn.sendMessage(sender, { 
+                  text: `🚫 You've been temporarily blocked for spamming. Please wait before sending more messages.` 
+              });
+              // You could also implement a temporary block here if needed
+              spamTracker[sender].count = 0;
+          }
+      }
+  });
+  // ================== END ANTI-SPAM ==================
+
+  // ================== ANTI-BUG FEATURE ==================
+  conn.ev.on('messages.upsert', async ({ messages }) => {
+      if (antiBug !== 'true') return;
+      
+      const message = messages[0];
+      const isGroup = message.key.remoteJid.endsWith('@g.us');
+      
+      // Check for potential bug exploits
+      if (message.message?.protocolMessage || 
+          message.message?.messageContextInfo?.placeholderKey ||
+          message.message?.ephemeralMessage?.message?.protocolMessage) {
+          console.log('Potential bug message detected:', message.key.remoteJid);
+          
+          // You can choose to ignore or delete these messages
+          try {
+              if (isGroup) {
+                  await conn.sendMessage(message.key.remoteJid, {
+                      delete: message.key
+                  });
+              }
+          } catch (error) {
+              console.error('Error handling potential bug:', error);
+          }
+      }
+      
+      // Additional checks for malformed messages
+      if (message.message && 
+          (!message.key || !message.key.remoteJid || !message.key.id)) {
+          console.log('Malformed message detected, ignoring');
+          return;
+      }
+  });
+  // ================== END ANTI-BUG ==================
 
   //==============================
 
@@ -559,10 +669,6 @@ if (isBanned) return; // Ignore banned users completely
       return fs.promises.unlink(pathFile)
     }
     //=====================================================
-    conn.parseMention = async(text) => {
-      return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
-    }
-    //=====================================================
     conn.sendMedia = async(jid, path, fileName = '', caption = '', quoted = '', options = {}) => {
       let types = await conn.getFile(path, true)
       let { mime, ext, res, data, filename } = types
@@ -631,8 +737,8 @@ if (isBanned) return; // Ignore banned users completely
         /**
          *
          * @param {*} jid
-         * @param {*} path
-         * @param {*} quoted
+         * @param {*} message
+         * @param {*} forceForward
          * @param {*} options
          * @returns
          */
