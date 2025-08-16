@@ -47,7 +47,20 @@ ${readMore}
 ✨ Powered by ${botName} ✨
         `;
 
-        await reply(menuText.trim());
+        // Send with contextInfo (View Channel)
+        await conn.sendMessage(m.chat, {
+            text: menuText.trim(),
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363288304618280@newsletter", // your channel JID
+                    newsletterName: "PK-XMD CHANNEL",
+                    serverMessageId: -1
+                }
+            }
+        }, { quoted: m });
+
     } catch (e) {
         console.error("Menu Error:", e);
         reply("❌ Failed to fetch menu.");
