@@ -32,7 +32,7 @@ cmd({
 ┃ 📅 *UPDATED ON:* ${app.updated || "N/A"}
 ┃ 👨‍💻 *DEVELOPER:* ${app?.developer?.name || "Unknown"}
 ╰━━━━━━━━━━━━━━━┈⊷
-> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ RAHEEM-CM*`;
+> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ NEXUS-AI*`;
 
     await conn.sendMessage(from, { react: { text: "⬆️", key: m.key } });
 
