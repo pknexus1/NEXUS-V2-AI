@@ -4,7 +4,7 @@ const { cmd } = require("../command");
 // Facebook Downloader v1 (basic)
 cmd({
   pattern: "fb",
-  alias: ["facebook2", "fbvideo2"],
+  alias: ["download", "fbvideo2"],
   react: '📥',
   desc: "Download videos from Facebook (Basic API)",
   category: "download",
