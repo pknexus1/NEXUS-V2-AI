@@ -37,12 +37,12 @@ ${readMore}
 
         for (let category in categorized) {
             menuText += `\n📂 *${category.toUpperCase()}*\n`;
-            menuText += categorized[category].map(cmd => `   ✦ .${cmd}`).join("\n") + "\n";
+            menuText += categorized[category].map(cmd => `> .${cmd}`).join("\n") + "\n";
         }
 
         menuText += `
 ────────────────────
-💬 Example: *.play song name*
+💬 Example: > .play song name
 ────────────────────
 ✨ Powered by ${botName} ✨
         `;
@@ -66,3 +66,4 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
+                                         
