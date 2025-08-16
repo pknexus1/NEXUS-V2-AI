@@ -4,7 +4,7 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display the Konde style menu",
+    desc: "Display the rich Konde style menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
@@ -24,7 +24,7 @@ cmd({
 
         const readMore = '\u200B'.repeat(4001);
 
-        // Build menu
+        // Build menu text
         let menuText = `
 ╭━━━〔 *${botName}* 〕━━━╮
 │ 📅 Date: ${dateNow}
@@ -47,29 +47,21 @@ ${readMore}
 ✨ Powered by ${botName} ✨
         `;
 
-        // Send menu text WITH contextInfo
+        // Send menu WITH image + audio + contextInfo
         await conn.sendMessage(m.chat, {
-            text: menuText.trim(),
+            image: { url: "https://files.catbox.moe/u4l28f.jpg" }, // Your menu image
+            caption: menuText.trim(),
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363288304618280@newsletter",
-                    newsletterName: "PK-XMD CHANNEL",
-                    serverMessageId: -1
-                }
-            }
-        }, { quoted: m });
-
-        // Send audio attached (nothing more)
-        await conn.sendMessage(m.chat, {
-            audio: { url: "https://files.catbox.moe/63jz9o.mp3" }, // replace with your song URL
-            mimetype: "audio/mpeg",
-            fileName: "menu-song.mp3",
-            ptt: false, // true if you want voice note
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
+                externalAdReply: {
+                    title: "🎵 Menu Music 🎵",
+                    body: "Powered by PK-XMD",
+                    mediaType: 2,
+                    mediaUrl: "https://files.catbox.moe/63jz9o.mp3",
+                    sourceUrl: "https://whatsapp.com/channel/0029VbAuCjELtOj5n8Lv9h3d",
+                    showAdAttribution: true
+                },
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363288304618280@newsletter",
                     newsletterName: "PK-XMD CHANNEL",
@@ -83,4 +75,4 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
-                
+            
