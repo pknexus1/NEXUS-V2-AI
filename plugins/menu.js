@@ -4,16 +4,26 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display the upgraded stylish menu",
+    desc: "Display a beautiful and unique menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
     try {
-        const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
-        const upTime = runtime(process.uptime());
-        const botName = "🤖 NEXUS-AI";
-        const ownerName = "👑 PK-Tech";
+        const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss').toUpperCase();
+        const upTime = runtime(process.uptime()).toUpperCase();
+        const botName = "🤖 NEXUS-AI".toUpperCase();
+        const ownerName = "👑 PK-TECH".toUpperCase();
         const totalCommands = Object.values(commands).length;
+
+        // Random quotes for menu
+        const quotes = [
+            "✨ Keep smiling, life is beautiful!",
+            "🚀 Code, create, conquer!",
+            "💡 Innovation distinguishes the leader from the follower.",
+            "🎯 Focus on progress, not perfection.",
+            "🌟 Stay positive and keep moving forward."
+        ];
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
         // Group commands by category
         let categorized = {};
@@ -24,30 +34,40 @@ cmd({
 
         const readMore = '\u200B'.repeat(4001);
 
-        // Build menu text
+        // Build menu header
         let menuText = `
-╭━━━〔 *${botName}* 〕━━━╮
-│ 📅 Date: ${dateNow}
-│ ⏳ Uptime: ${upTime}
-│ 👤 Owner: ${ownerName}
-│ 📌 Total Commands: ${totalCommands}
-╰━━━━━━━━━━━━━━━━━━━╯
+╔═══════════════════════╗
+║      ${botName}       
+║───────────────────────
+║ 📅 DATE: ${dateNow}
+║ ⏳ UPTIME: ${upTime}
+║ 👤 OWNER: ${ownerName}
+║ 📌 TOTAL COMMANDS: ${totalCommands}
+╚═══════════════════════╝
 ${readMore}
 `;
 
+        // Build command list with spacing and stars
         for (let category in categorized) {
-            menuText += `\n📂 *${category.toUpperCase()} COMMANDS*\n`;
-            menuText += categorized[category].map(cmd => `   • .${cmd}`).join("\n") + "\n";
+            menuText += `\n🌟 *${category.toUpperCase()}*\n\n`;
+            const cmds = categorized[category].map(cmd => `★ * . ${cmd} *`).join("\n\n");
+            const midIndex = Math.floor(cmds.split("\n\n").length / 2);
+            const cmdsArray = cmds.split("\n\n");
+            
+            // Insert separator in middle
+            cmdsArray.splice(midIndex, 0, "-----||-----||-----||-----");
+            menuText += cmdsArray.join("\n\n") + "\n\n";
         }
 
+        // Add random quote at bottom
         menuText += `
-────────────────────
-💡 Example Usage: .play <song name>
-────────────────────
-✨ Powered by PK-TECH ✨
+────────────────────────────
+💬 Quote: "${randomQuote}"
+────────────────────────────
+✨ POWERED BY PK-TECH ✨
 `;
 
-        // 1️⃣ Send menu image with caption & fake newsletter context
+        // Send menu image with caption & context info
         await conn.sendMessage(m.chat, {
             image: { url: "https://files.catbox.moe/u4l28f.jpg" },
             caption: menuText.trim(),
@@ -62,7 +82,7 @@ ${readMore}
             }
         }, { quoted: m });
 
-        // 2️⃣ Send PTT music separately
+        // Send PTT music separately
         await conn.sendMessage(m.chat, {
             audio: { url: "https://files.catbox.moe/63jz9o.mp3" },
             mimetype: "audio/mpeg",
@@ -74,3 +94,4 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
+            
