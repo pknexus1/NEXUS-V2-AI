@@ -47,21 +47,13 @@ ${readMore}
 ✨ Powered by ${botName} ✨
         `;
 
-        // Send menu WITH image + audio + contextInfo
+        // 1️⃣ Send menu image with caption
         await conn.sendMessage(m.chat, {
-            image: { url: "https://files.catbox.moe/u4l28f.jpg" }, // Your menu image
+            image: { url: "https://files.catbox.moe/u4l28f.jpg" },
             caption: menuText.trim(),
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
-                externalAdReply: {
-                    title: "🎵 Menu Music 🎵",
-                    body: "Powered by PK-XMD",
-                    mediaType: 2,
-                    mediaUrl: "https://files.catbox.moe/63jz9o.mp3",
-                    sourceUrl: "https://whatsapp.com/channel/0029VbAuCjELtOj5n8Lv9h3d",
-                    showAdAttribution: true
-                },
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363288304618280@newsletter",
                     newsletterName: "PK-XMD CHANNEL",
@@ -70,9 +62,15 @@ ${readMore}
             }
         }, { quoted: m });
 
+        // 2️⃣ Send actual PTT music separately
+        await conn.sendMessage(m.chat, {
+            audio: { url: "https://files.catbox.moe/63jz9o.mp3" },
+            mimetype: "audio/mpeg",
+            ptt: true
+        });
+
     } catch (e) {
         console.error("Menu Error:", e);
         reply("❌ Failed to fetch menu.");
     }
 });
-            
