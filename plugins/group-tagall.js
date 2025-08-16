@@ -1,6 +1,6 @@
 const config = require('../config')
 const { cmd, commands } = require('../command')
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson} = require('../lib/functions')
+const { runtime } = require('../lib/functions')
 
 cmd({
     pattern: "tagall",
@@ -11,7 +11,7 @@ cmd({
     use: '.tagall [message]',
     filename: __filename
 },
-async (conn, mek, m, { from, participants, reply, isGroup, senderNumber, groupAdmins, prefix, command, args, body }) => {
+async (conn, mek, m, { from, participants, reply, isGroup, senderNumber, groupAdmins, prefix, command, args, body, sender }) => {
     try {
         if (!isGroup) return reply("❌ This command can only be used in groups.");
         
@@ -46,11 +46,28 @@ async (conn, mek, m, { from, participants, reply, isGroup, senderNumber, groupAd
 
         teks += "└──✪ NEXUS ┃ AI ✪──";
 
-        conn.sendMessage(from, { text: teks, mentions: participants.map(a => a.id) }, { quoted: mek });
+        await conn.sendMessage(from, { 
+            text: teks, 
+            mentions: participants.map(a => a.id),
+            contextInfo: {
+                mentionedJid: participants.map(a => a.id),
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363288304618280@newsletter', // yako
+                    serverMessageId: 1
+                },
+                externalAdReply: {
+                    title: `🔊 Group Tagging`,
+                    body: `NEXUS-AI • Tagged ${totalMembers} members`,
+                    thumbnailUrl: "https://files.catbox.moe/qoupjv.jpg", // optional, weka logo yako
+                    sourceUrl: "https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x"
+                }
+            }
+        }, { quoted: mek });
 
     } catch (e) {
         console.error("TagAll Error:", e);
         reply(`❌ *Error Occurred !!*\n\n${e.message || e}`);
     }
 });
-
