@@ -50,42 +50,112 @@ const bioQuotes = [
   () => {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: true
     });
-    return `⏰ ${timeString} | NEXUS-AI 🤖 | Always Active`;
+    return `⏰ ${timeString} | NEXUS-AI 🤖 | Always Active | Nairobi Time`;
   },
   () => {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: true
     });
-    return `🔄 ${timeString} | NEXUS-AI 🤖 | Processing Requests`;
+    return `🔄 ${timeString} | NEXUS-AI 🤖 | Processing Requests | KE Time`;
   },
   () => {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: true
     });
-    return `⚡ ${timeString} | NEXUS-AI 🤖 | Lightning Fast`;
+    return `⚡ ${timeString} | NEXUS-AI 🤖 | Lightning Fast | EAT`;
   },
   () => {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: true
     });
-    return `🌐 ${timeString} | NEXUS-AI 🤖 | Connected Worldwide`;
+    return `🌐 ${timeString} | NEXUS-AI 🤖 | Connected Worldwide | GMT+3`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `🤖 ${timeString} | NEXUS-AI | Serving 24/7 | Kenya Time`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `💡 ${timeString} | NEXUS-AI | Smart Assistant | EAT`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `🔮 ${timeString} | NEXUS-AI | Future of AI | Nairobi`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `🚀 ${timeString} | NEXUS-AI | Next Gen Tech | KE`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `💻 ${timeString} | NEXUS-AI | Coding the Future | EAT`;
+  },
+  () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'Africa/Nairobi',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `📡 ${timeString} | NEXUS-AI | Always Online | Nairobi Time`;
   }
 ];
 
