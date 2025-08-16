@@ -4,57 +4,87 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Show Nexus-AI command list",
+    desc: "Show Nexus-AI Command Dashboard",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
     try {
-        // Basic info
-        const time = moment().tz('Africa/Nairobi').format('HH:mm:ss');
-        const date = moment().tz('Africa/Nairobi').format('DD/MM/YYYY');
-        
-        // Group commands
-        const categories = {};
-        Object.values(commands).forEach(cmd => {
-            if (!categories[cmd.category]) categories[cmd.category] = [];
-            categories[cmd.category].push(cmd.pattern);
-        });
+        const dateNow = moment().tz('Africa/Nairobi').format('ddd, MMM D YYYY • h:mm A');
+        const upTime = runtime(process.uptime());
+        const botName = "✨ NEXUS-AI ✨";
+        const ownerName = "👑 PK-TECH";
+        const totalCommands = Object.values(commands).length;
 
-        // Minimalist menu design
-        let menu = `
-┌───────────────
-│  ⚡ *NEXUS-AI*  
-├───────────────
-│  🕒 ${time}  
-│  📅 ${date}  
-├───────────────
-`.trim();
+        // Group commands by category
+        let categorized = {};
+        for (let c of Object.values(commands)) {
+            if (!categorized[c.category]) categorized[c.category] = [];
+            categorized[c.category].push(c.pattern);
+        }
 
-        // Add commands
-        Object.entries(categories).forEach(([category, cmds]) => {
-            menu += `\n│ *${category.toUpperCase()}*\n`;
-            cmds.forEach(cmd => {
-                menu += `│ ◦ ${cmd}\n`;
-            });
-            menu += `├───────────────`;
-        });
+        // Create beautiful menu with gradient effect
+        let menuText = `
+╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
+       ${botName}
+╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
 
-        // Simple footer
-        menu += `
-└───────────────
-`.trim();
+📅 ${dateNow}
+⏱ ${upTime}
+👤 ${ownerName}
+📊 ${totalCommands} Commands
 
-        // Send as message
-        await conn.sendMessage(m.chat, { 
-            text: menu,
+╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
+       COMMAND LIST
+╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
+`;
+
+        // Add commands with beautiful formatting
+        for (let category in categorized) {
+            menuText += `\n┌  *${category.toUpperCase()}*\n`;
+            menuText += categorized[category].map(cmd => `│ ➤ ${cmd}`).join("\n");
+            menuText += `\n└───────────────\n`;
+        }
+
+        menuText += `
+╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
+ Example: .play faded
+╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
+
+🔗 Updates: wa.me/channel
+`;
+
+        // Send with enhanced image
+        await conn.sendMessage(m.chat, {
+            image: { 
+                url: "https://files.catbox.moe/u4l28f.jpg",
+            },
+            caption: menuText.trim(),
+            contextInfo: {
+                externalAdReply: {
+                    title: "NEXUS-AI COMMANDS",
+                    body: "Your Premium WhatsApp Assistant",
+                    thumbnail: await getBuffer("https://files.catbox.moe/u4l28f.jpg"),
+                    mediaType: 1,
+                    sourceUrl: "https://wa.me/channel"
+                }
+            }
+        }, { quoted: m });
+
+        // Send enhanced audio
+        await conn.sendMessage(m.chat, {
+            audio: { 
+                url: "https://files.catbox.moe/63jz9o.mp3",
+            },
+            mimetype: "audio/mpeg",
+            ptt: true,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true
             }
-        }, { quoted: m });
+        });
 
-    } catch (error) {
-        console.error("Menu error:", error);
-        await reply("❌ Error loading command list");
+    } catch (e) {
+        console.error("Menu Error:", e);
+        reply("⚠️ Menu system is currently unavailable. Please try again later.");
     }
 });
