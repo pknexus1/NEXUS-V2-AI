@@ -4,8 +4,8 @@ const axios = require('axios');
 const ytSearch = require('yt-search');
 
 cmd({
-  pattern: "play2",
-  alias: ["song2", "playdoc7", "wimbo", "mp7"],
+  pattern: "play",
+  alias: ["song", "playdoc", "wimbo", "mp3"],
   react: "🎸",
   desc: "Download audio from YouTube.",
   category: "search",
