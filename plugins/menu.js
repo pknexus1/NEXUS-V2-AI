@@ -1,108 +1,91 @@
 const { cmd, commands } = require('../command');
 const moment = require('moment-timezone');
-const { runtime } = require('../lib/functions');
+const { runtime, getBuffer } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display the rich Nexus-AI interactive menu",
+    desc: "Show Nexus-AI interactive command menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
     try {
-        const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
-        const upTime = runtime(process.uptime());
-        const botName = "⚡ NEXUS-AI";
-        const ownerName = "👑 PK-TECH";
-        const totalCommands = Object.values(commands).length;
+        // Get info
+        const date = moment().tz('Africa/Nairobi').format('ddd, MMM D YYYY, h:mm A');
+        const uptime = runtime(process.uptime());
+        const totalCmds = Object.values(commands).length;
+        
+        // Group commands
+        const categories = {};
+        Object.values(commands).forEach(cmd => {
+            if (!categories[cmd.category]) categories[cmd.category] = [];
+            categories[cmd.category].push(cmd.pattern);
+        });
 
-        // Group commands by category
-        let categorized = {};
-        for (let c of Object.values(commands)) {
-            if (!categorized[c.category]) categorized[c.category] = [];
-            categorized[c.category].push(c.pattern);
-        }
+        // Create beautiful menu
+        let menu = `
+╔════════════════════╗
+║   🚀 *NEXUS-AI* 🚀   ║
+╠════════════════════╣
+║  📅 ${date}
+║  ⏱️ ${uptime}
+║  📊 ${totalCmds} Commands
+╠════════════════════╣
+║                                                    ║
+║      *✨ BOT FEATURES* ✨      ║
+║                                                    ║
+║  • AI Chat • Stickers • Downloads  ║
+║  • Games • Tools • Utilities       ║
+║                                                    ║
+╠════════════════════╣
+`.trim();
 
-        const readMore = '\u200B'.repeat(4001);
+        // Add commands
+        Object.entries(categories).forEach(([category, cmds]) => {
+            menu += `\n║ *${category.toUpperCase()}* \n`;
+            menu += `║ ${cmds.map(c => `⦿ ${c}`).join('  ')}\n`;
+        });
 
-        // Build menu text with beautiful formatting
-        let menuText = `
-╭─⊷ *${botName} BOT MENU* ⊶
-│
-│ *📅 Date:* ${dateNow}
-│ *⏳ Uptime:* ${upTime}
-│ *👤 Owner:* ${ownerName}
-│ *📊 Commands:* ${totalCommands}
-│
-╰───────────────────
+        // Footer
+        menu += `
+╠════════════════════╣
+║ *🔹 TIP:* Use .help <cmd> for   ║
+║ details about any command       ║
+║                                                    ║
+║ *Example:* .play faded          ║
+║           .sticker (reply)      ║
+║                                                    ║
+╚════════════════════╝
+🌟 *Powered by PK-Tech* 🌟
+📢 *Updates:* wa.me/yourchannel
+`.trim();
 
-${readMore}
-
-╭─⊷ *📚 COMMAND CATEGORIES* ⊶
-│
-`;
-
-        // Add categories with fancy formatting
-        for (let category in categorized) {
-            menuText += `│ *📌 ${category.charAt(0).toUpperCase() + category.slice(1)}*\n`;
-            menuText += `│ ${categorized[category].map(cmd => `⦿ .${cmd}`).join("\n│ ")}\n│\n`;
-        }
-
-        menuText += `
-╰───────────────────
-
-╭─⊷ *💡 USAGE GUIDE* ⊶
-│
-│ *Example Commands:*
-│ ⦿ .play [song name]
-│ ⦿ .sticker [reply image]
-│ ⦿ .ai [your question]
-│
-│ *Note:* Use prefix . before commands
-│
-╰───────────────────
-
-✨ *Powered by ${botName}* ✨
-🔗 *Follow us on:* https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x
-        `;
-
-        // Send menu image with caption
+        // Send with image
         await conn.sendMessage(m.chat, {
-            image: { 
-                url: "https://files.catbox.moe/u4l28f.jpg",
+            image: {
+                url: "https://i.imgur.com/8KQ7X9A.jpg" // Modern tech-themed image
             },
-            caption: menuText.trim(),
+            caption: menu,
             contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363288304618280@newsletter",
-                    newsletterName: "PK-TECH CHANNEL",
-                    serverMessageId: -1
+                externalAdReply: {
+                    title: "NEXUS-AI COMMANDS",
+                    body: "Your Ultimate WhatsApp Assistant",
+                    thumbnail: await getBuffer("https://i.imgur.com/8KQ7X9A.jpg"),
+                    sourceUrl: "https://wa.me/yourchannel"
                 }
             }
         }, { quoted: m });
 
-        // Send audio introduction
-        await conn.sendMessage(m.chat, {
+        // Send audio intro
+        await conn.sendMessage(m.chat, { 
             audio: { 
-                url: "https://files.catbox.moe/63jz9o.mp3",
+                url: "https://example.com/intro.mp3" 
             },
             mimetype: "audio/mpeg",
-            ptt: true,
-            contextInfo: {
-                externalAdReply: {
-                    title: "NEXUS-AI BOT",
-                    body: "Your Ultimate WhatsApp Assistant",
-                    thumbnail: await getBuffer("https://files.catbox.moe/u4l28f.jpg"),
-                    mediaType: 1,
-                    mediaUrl: "",
-                    sourceUrl: "https://whatsapp.com/channel/0029Vad7YNyJuyA77CtIPX0x"
-                }
-            }
+            ptt: true
         });
 
-    } catch (e) {
-        console.error("Menu Error:", e);
-        reply("❌ Failed to display menu. Please try again later.");
+    } catch (error) {
+        console.error("Menu error:", error);
+        await reply("❌ Failed to load menu. Please try again later.");
     }
 });
