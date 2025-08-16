@@ -1,6 +1,23 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
+// Shared function to send AI reply with contextInfo
+async function sendAIReply(conn, m, text) {
+    await conn.sendMessage(m.chat, {
+        text,
+        contextInfo: {
+            forwardingScore: 999,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: "120363288304618280@newsletter", // your channel JID
+                newsletterName: "PK-XMD CHANNEL",
+                serverMessageId: -1
+            }
+        }
+    }, { quoted: m });
+}
+
+// General AI (Lance-Frank API)
 cmd({
     pattern: "ai",
     alias: ["bot", "dj", "gpt", "gpt4", "bing"],
@@ -9,27 +26,28 @@ cmd({
     react: "🤖",
     filename: __filename
 },
-async (conn, mek, m, { from, args, q, reply, react }) => {
+async (conn, mek, m, { q, react }) => {
     try {
-        if (!q) return reply("Please provide a message for the AI.\nExample: `.ai Hello`");
+        if (!q) return sendAIReply(conn, m, "Please provide a message for the AI.\nExample: `.ai Hello`");
 
         const apiUrl = `https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`;
         const { data } = await axios.get(apiUrl);
 
         if (!data || !data.message) {
             await react("❌");
-            return reply("AI failed to respond. Please try again later.");
+            return sendAIReply(conn, m, "AI failed to respond. Please try again later.");
         }
 
-        await reply(`🤖 *AI Response:*\n\n${data.message}`);
+        await sendAIReply(conn, m, `🤖 *AI Response:*\n\n${data.message}`);
         await react("✅");
     } catch (e) {
         console.error("Error in AI command:", e);
         await react("❌");
-        reply("An error occurred while communicating with the AI.");
+        sendAIReply(conn, m, "An error occurred while communicating with the AI.");
     }
 });
 
+// OpenAI
 cmd({
     pattern: "openai",
     alias: ["chatgpt", "gpt3", "open-gpt"],
@@ -38,27 +56,28 @@ cmd({
     react: "🧠",
     filename: __filename
 },
-async (conn, mek, m, { from, args, q, reply, react }) => {
+async (conn, mek, m, { q, react }) => {
     try {
-        if (!q) return reply("Please provide a message for OpenAI.\nExample: `.openai Hello`");
+        if (!q) return sendAIReply(conn, m, "Please provide a message for OpenAI.\nExample: `.openai Hello`");
 
         const apiUrl = `https://vapis.my.id/api/openai?q=${encodeURIComponent(q)}`;
         const { data } = await axios.get(apiUrl);
 
         if (!data || !data.result) {
             await react("❌");
-            return reply("OpenAI failed to respond. Please try again later.");
+            return sendAIReply(conn, m, "OpenAI failed to respond. Please try again later.");
         }
 
-        await reply(`🧠 *OpenAI Response:*\n\n${data.result}`);
+        await sendAIReply(conn, m, `🧠 *OpenAI Response:*\n\n${data.result}`);
         await react("✅");
     } catch (e) {
         console.error("Error in OpenAI command:", e);
         await react("❌");
-        reply("An error occurred while communicating with OpenAI.");
+        sendAIReply(conn, m, "An error occurred while communicating with OpenAI.");
     }
 });
 
+// DeepSeek
 cmd({
     pattern: "deepseek",
     alias: ["deep", "seekai"],
@@ -67,25 +86,24 @@ cmd({
     react: "🧠",
     filename: __filename
 },
-async (conn, mek, m, { from, args, q, reply, react }) => {
+async (conn, mek, m, { q, react }) => {
     try {
-        if (!q) return reply("Please provide a message for DeepSeek AI.\nExample: `.deepseek Hello`");
+        if (!q) return sendAIReply(conn, m, "Please provide a message for DeepSeek AI.\nExample: `.deepseek Hello`");
 
         const apiUrl = `https://api.ryzendesu.vip/api/ai/deepseek?text=${encodeURIComponent(q)}`;
         const { data } = await axios.get(apiUrl);
 
         if (!data || !data.answer) {
             await react("❌");
-            return reply("DeepSeek AI failed to respond. Please try again later.");
+            return sendAIReply(conn, m, "DeepSeek AI failed to respond. Please try again later.");
         }
 
-        await reply(`🧠 *DeepSeek AI Response:*\n\n${data.answer}`);
+        await sendAIReply(conn, m, `🧠 *DeepSeek AI Response:*\n\n${data.answer}`);
         await react("✅");
     } catch (e) {
-        console.error("Error in DeepSeek AI command:", e);
+        console.error("Error in DeepSeek command:", e);
         await react("❌");
-        reply("An error occurred while communicating with DeepSeek AI.");
+        sendAIReply(conn, m, "An error occurred while communicating with DeepSeek AI.");
     }
 });
-
-
+            
