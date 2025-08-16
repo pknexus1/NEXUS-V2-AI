@@ -56,7 +56,7 @@ ${readMore}
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363288304618280@newsletter",
-                    newsletterName: "PK-XMD CHANNEL",
+                    newsletterName: "PK-TECH CHANNEL",
                     serverMessageId: -1
                 }
             }
