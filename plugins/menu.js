@@ -4,7 +4,7 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display the rich Konde style menu",
+    desc: "Display the upgraded stylish menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
@@ -30,24 +30,24 @@ cmd({
 │ 📅 Date: ${dateNow}
 │ ⏳ Uptime: ${upTime}
 │ 👤 Owner: ${ownerName}
-│ 📌 Total Cmds: ${totalCommands}
+│ 📌 Total Commands: ${totalCommands}
 ╰━━━━━━━━━━━━━━━━━━━╯
 ${readMore}
 `;
 
         for (let category in categorized) {
-            menuText += `\n📂 *${category.toUpperCase()}*\n`;
-            menuText += categorized[category].map(cmd => `> .${cmd}`).join("\n") + "\n";
+            menuText += `\n📂 *${category.toUpperCase()} COMMANDS*\n`;
+            menuText += categorized[category].map(cmd => `   • .${cmd}`).join("\n") + "\n";
         }
 
         menuText += `
 ────────────────────
-💬 Example: > .play song name
+💡 Example Usage: .play <song name>
 ────────────────────
-✨ Powered by ${botName} ✨
-        `;
+✨ Powered by PK-TECH ✨
+`;
 
-        // 1️⃣ Send menu image with caption
+        // 1️⃣ Send menu image with caption & fake newsletter context
         await conn.sendMessage(m.chat, {
             image: { url: "https://files.catbox.moe/u4l28f.jpg" },
             caption: menuText.trim(),
@@ -62,7 +62,7 @@ ${readMore}
             }
         }, { quoted: m });
 
-        // 2️⃣ Send actual PTT music separately
+        // 2️⃣ Send PTT music separately
         await conn.sendMessage(m.chat, {
             audio: { url: "https://files.catbox.moe/63jz9o.mp3" },
             mimetype: "audio/mpeg",
