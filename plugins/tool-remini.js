@@ -70,11 +70,20 @@ cmd({
     const outputPath = path.join(os.tmpdir(), `remini_output_${Date.now()}.jpg`);
     fs.writeFileSync(outputPath, response.data);
 
-    // Send the enhanced image with loading message
+    // Send the enhanced image with contextInfo
     await reply("🔄 Enhancing image quality...");
     await client.sendMessage(message.chat, {
       image: fs.readFileSync(outputPath),
       caption: "✅ Image enhanced successfully!",
+      contextInfo: {
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: "120363288304618280@newsletter", // your channel JID
+          newsletterName: "PK-XMD CHANNEL",
+          serverMessageId: -1
+        }
+      }
     }, { quoted: message });
 
     // Clean up
@@ -85,3 +94,4 @@ cmd({
     await reply(`❌ Error: ${error.message || "Failed to enhance image. The image might be too large or the API is unavailable."}`);
   }
 });
+            
