@@ -4,7 +4,7 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Display a beautiful and unique menu",
+    desc: "Display a beautiful, unique menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
@@ -36,26 +36,28 @@ cmd({
 
         // Build menu header
         let menuText = `
-╔═══════════════════════╗
-║      ${botName}       
-║───────────────────────
-║ 📅 DATE: ${dateNow}
-║ ⏳ UPTIME: ${upTime}
-║ 👤 OWNER: ${ownerName}
-║ 📌 TOTAL COMMANDS: ${totalCommands}
-╚═══════════════════════╝
+╔════════════════════════╗
+║       ${botName}       
+║────────────────────────
+║ 📅 DATE       : ${dateNow}
+║ ⏳ UPTIME     : ${upTime}
+║ 👤 OWNER      : ${ownerName}
+║ 📌 TOTAL CMD  : ${totalCommands}
+║ 💻 PREFIX     : *
+╚════════════════════════╝
 ${readMore}
 `;
 
-        // Build command list with spacing and stars
+        // Build command list like "> ★ *play*"
         for (let category in categorized) {
             menuText += `\n🌟 *${category.toUpperCase()}*\n\n`;
-            const cmds = categorized[category].map(cmd => `★ * . ${cmd} *`).join("\n\n");
-            const midIndex = Math.floor(cmds.split("\n\n").length / 2);
-            const cmdsArray = cmds.split("\n\n");
-            
-            // Insert separator in middle
+            const cmdsArray = categorized[category].map(cmd => `> ★ *${cmd}*`);
+
+            // Insert big separator in the middle
+            const midIndex = Math.floor(cmdsArray.length / 2);
             cmdsArray.splice(midIndex, 0, "-----||-----||-----||-----");
+
+            // Join commands with spacing
             menuText += cmdsArray.join("\n\n") + "\n\n";
         }
 
@@ -68,7 +70,7 @@ ${readMore}
 `;
 
         // Send menu image with caption & context info
-        await conn.sendMessage(m.chat, {
+        const menuMessage = await conn.sendMessage(m.chat, {
             image: { url: "https://files.catbox.moe/u4l28f.jpg" },
             caption: menuText.trim(),
             contextInfo: {
@@ -82,11 +84,23 @@ ${readMore}
             }
         }, { quoted: m });
 
-        // Send PTT music separately
+        // Send PTT music separately replying to menu
         await conn.sendMessage(m.chat, {
             audio: { url: "https://files.catbox.moe/63jz9o.mp3" },
             mimetype: "audio/mpeg",
-            ptt: true
+            ptt: true,
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                externalAdReply: {
+                    mediaUrl: "https://files.catbox.moe/63jz9o.mp3",
+                    mediaType: 2,
+                    title: "PK-TECH CHANNEL",
+                    body: "NEXUS-AI BOT MUSIC",
+                    thumbnail: await (await fetch("https://files.catbox.moe/u4l28f.jpg")).arrayBuffer(),
+                },
+                quoted: menuMessage
+            }
         });
 
     } catch (e) {
@@ -94,4 +108,3 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
-            
