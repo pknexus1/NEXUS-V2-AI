@@ -7,7 +7,7 @@ cmd({
     desc: "Display the Konde style menu",
     category: "main",
     filename: __filename
-}, async (conn, m, { reply }) => {
+}, async (conn, m, { reply, from }) => {
     try {
         const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
@@ -47,18 +47,17 @@ ${readMore}
 ✨ Powered by ${botName} ✨
         `;
 
-        // Send with contextInfo (View Channel)
+        // Tuma menu kama text
         await conn.sendMessage(m.chat, {
-            text: menuText.trim(),
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363288304618280@newsletter", // your channel JID
-                    newsletterName: "PK-XMD CHANNEL",
-                    serverMessageId: -1
-                }
-            }
+            text: menuText.trim()
+        }, { quoted: m });
+
+        // Tuma wimbo (weka link yako ya audio hapa)
+        await conn.sendMessage(m.chat, {
+            audio: { url: "https://files.catbox.moe/63jz9o.mp3" }, // badilisha na link ya wimbo unataka
+            mimetype: "audio/mpeg",
+            ptt: false, // true kama unataka iwe voice note
+            fileName: "menu-song.mp3"
         }, { quoted: m });
 
     } catch (e) {
@@ -66,4 +65,4 @@ ${readMore}
         reply("❌ Failed to fetch menu.");
     }
 });
-                                         
+        
