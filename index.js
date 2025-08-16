@@ -181,8 +181,8 @@ async function connectToWA() {
     hour12: true
   });
   
-  // Updated connection message with more context
-  let up = `╭─〔 *🌐 NEXUS-AI CONNECTION ESTABLISHED* 〕
+  // Updated connection message with newsletter context
+let up = `╭─〔 *🌐 NEXUS-AI CONNECTION ESTABLISHED* 〕
 ├─ *🕒 Connection Time:* ${connectTime}
 ├─ *⚡ Uptime:* ${runtime(process.uptime())}
 ├─ *📊 Memory Usage:* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB
@@ -195,16 +195,21 @@ async function connectToWA() {
 ├─ *🤖 Mode:* ${config.MODE}
 ╰─➤ *🔮 Powered by Nexus-AI | © ${new Date().getFullYear()}*`;
 
-  // Send connection message with more details
-  conn.sendMessage(conn.user.id, { 
-    image: { url: `https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg` }, 
-    caption: up,
-    contextInfo: {
-      mentionedJid: [conn.user.id],
-      forwardingScore: 999,
-      isForwarded: true
+// Send connection message with more details
+conn.sendMessage(conn.user.id, { 
+  image: { url: `https://i.postimg.cc/8PdnzqyR/035dac52-2789-4d02-a4b8-02290fa4f160.jpg` }, 
+  caption: up,
+  contextInfo: {
+    mentionedJid: [conn.user.id],
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: "120363288304618280@newsletter",
+      newsletterName: "PK-XMD CHANNEL",
+      serverMessageId: -1
     }
-  });
+  }
+});
 
   // Start auto-bio feature with live time
   updateBio(conn); // Update immediately
