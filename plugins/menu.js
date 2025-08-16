@@ -4,15 +4,15 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu",
-    desc: "Show Nexus-AI Command Dashboard",
+    desc: "Display the rich Konde style menu",
     category: "main",
     filename: __filename
 }, async (conn, m, { reply }) => {
     try {
-        const dateNow = moment().tz('Africa/Nairobi').format('ddd, MMM D YYYY • h:mm A');
+        const dateNow = moment().tz('Africa/Nairobi').format('dddd, MMMM Do YYYY, HH:mm:ss');
         const upTime = runtime(process.uptime());
-        const botName = "✨ NEXUS-AI ✨";
-        const ownerName = "👑 PK-TECH";
+        const botName = "🤖 NEXUS-AI";
+        const ownerName = "👑 PK-Tech";
         const totalCommands = Object.values(commands).length;
 
         // Group commands by category
@@ -22,69 +22,55 @@ cmd({
             categorized[c.category].push(c.pattern);
         }
 
-        // Create beautiful menu with gradient effect
+        const readMore = '\u200B'.repeat(4001);
+
+        // Build menu text
         let menuText = `
-╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
-       ${botName}
-╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
-
-📅 ${dateNow}
-⏱ ${upTime}
-👤 ${ownerName}
-📊 ${totalCommands} Commands
-
-╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
-       COMMAND LIST
-╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
+╭━━━〔 *${botName}* 〕━━━╮
+│ 📅 Date: ${dateNow}
+│ ⏳ Uptime: ${upTime}
+│ 👤 Owner: ${ownerName}
+│ 📌 Total Cmds: ${totalCommands}
+╰━━━━━━━━━━━━━━━━━━━╯
+${readMore}
 `;
 
-        // Add commands with beautiful formatting
         for (let category in categorized) {
-            menuText += `\n┌  *${category.toUpperCase()}*\n`;
-            menuText += categorized[category].map(cmd => `│ ➤ ${cmd}`).join("\n");
-            menuText += `\n└───────────────\n`;
+            menuText += `\n📂 *${category.toUpperCase()}*\n`;
+            menuText += categorized[category].map(cmd => `> .${cmd}`).join("\n") + "\n";
         }
 
         menuText += `
-╭── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╮
- Example: .play faded
-╰── ⋅ ⋅ ── ✩ ── ⋅ ⋅ ──╯
+────────────────────
+💬 Example: > .play song name
+────────────────────
+✨ Powered by ${botName} ✨
+        `;
 
-🔗 Updates: wa.me/channel
-`;
-
-        // Send with enhanced image
+        // 1️⃣ Send menu image with caption
         await conn.sendMessage(m.chat, {
-            image: { 
-                url: "https://files.catbox.moe/u4l28f.jpg",
-            },
+            image: { url: "https://files.catbox.moe/u4l28f.jpg" },
             caption: menuText.trim(),
             contextInfo: {
-                externalAdReply: {
-                    title: "NEXUS-AI COMMANDS",
-                    body: "Your Premium WhatsApp Assistant",
-                    thumbnail: await getBuffer("https://files.catbox.moe/u4l28f.jpg"),
-                    mediaType: 1,
-                    sourceUrl: "https://wa.me/channel"
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363288304618280@newsletter",
+                    newsletterName: "PK-TECH CHANNEL",
+                    serverMessageId: -1
                 }
             }
         }, { quoted: m });
 
-        // Send enhanced audio
+        // 2️⃣ Send actual PTT music separately
         await conn.sendMessage(m.chat, {
-            audio: { 
-                url: "https://files.catbox.moe/63jz9o.mp3",
-            },
+            audio: { url: "https://files.catbox.moe/63jz9o.mp3" },
             mimetype: "audio/mpeg",
-            ptt: true,
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true
-            }
+            ptt: true
         });
 
     } catch (e) {
         console.error("Menu Error:", e);
-        reply("⚠️ Menu system is currently unavailable. Please try again later.");
+        reply("❌ Failed to fetch menu.");
     }
 });
